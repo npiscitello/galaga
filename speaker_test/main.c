@@ -10,12 +10,15 @@ uint8_t sample_index = 0;
 
 ISR(TIM1_OVF_vect) {
   // we're only working with 8-bit here
+  /*
   OCR1AL = samples[sample_index];
   if( sample_index < NUM_SAMPLES ) {
     sample_index++;
   } else {
     sample_index = 0;
   }
+  */
+  OCR1AL = samples[(sample_index++)%NUM_SAMPLES];
 }
 
 int main() {
@@ -38,8 +41,9 @@ int main() {
   // waveform setup (load new value to OCR1A every TOP interrupt)
   // enable global interrupts
   sei();
-  // enable timer1 TOP interrupts
-  TIMSK1 = 0x00 | _BV(TOV1);
+  // enable timer1 TOP interrupts and clear pending interrupts
+  TIMSK1 = 0x00 | _BV(TOIE1);
+  TIFR1 = 0xFF;
   // clear OCR1AH b/c we're only dealing with 8 bit for now
   OCR1AH = 0x00;
 
