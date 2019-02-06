@@ -6,22 +6,7 @@
 // higher resolution means a lower frequency
 #define PWM_RESOLUTION 0x00FF
 
-// we want an ~2kHz sine wave, so we need 16 samples
-#define NUM_SAMPLES 32
-const uint8_t PROGMEM sine_samples[] = {
-  128, 153, 177, 198, 219, 233, 246, 248, 250, 248, 246, 233, 219, 198, 177, 153,
-  128, 104, 79, 58, 37, 24, 10, 5, 0, 5, 10, 24, 37, 58, 79, 104
-};
-const uint8_t PROGMEM square_samples[] = {
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-};
-const uint8_t PROGMEM silent_samples[] = {
-  0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-  0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-};
-
-uint32_t sample_index = 0;
+volatile uint32_t sample_index = 0;
 ISR(TIMER1_OVF_vect) {
   // YCM doesn't like this - makes sense that AVR assembler magic won't work locally.
   OCR1AL = pgm_read_byte_near(audio_samples + sample_index);
