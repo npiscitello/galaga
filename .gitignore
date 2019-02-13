@@ -8,3 +8,5 @@
 *.o
 *.sym
 *.swp
+fatfs/documents
+*.zip
