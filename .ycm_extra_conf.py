@@ -27,8 +27,8 @@ flags = [
 # This is only to prevent errors, the real freq. value is in the makefile
 '-D', 'F_CPU=16000000UL',
 # other compiler directives (stolen from avr Makefile)
-'-g', 'dwarf-2',
-'-O', 's',
+#'-g', 'dwarf-2',
+#'-O', 's',
 '-funsigned-char',
 '-funsigned-bitfields',
 '-fpack-struct',
@@ -50,7 +50,8 @@ flags = [
 # For a C project, you would set this to 'c' instead of 'c++'.
 '-x', 'c',
 # AVR Include files
-'-isystem', '/usr/avr/include'
+'-isystem', '/usr/avr/include',
+'-isystem', './fatfs/source'
 ]
 
 
