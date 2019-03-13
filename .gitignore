@@ -10,3 +10,4 @@
 *.swp
 fatfs/documents
 *.zip
+fatfs_samples/

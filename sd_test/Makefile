@@ -81,7 +81,8 @@ OBJDIR = .
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c	\
-			./storage_driver.c 	\
+			./mmc_avr_spi.c 	\
+			./diskio.c \
 			../fatfs/source/ff.c
 
 
