@@ -17,12 +17,15 @@
 #include "mmc_avr.h"
 
 /* Peripheral controls (Platform dependent) */
-#define CS_LOW()		  1==1	    /* Set MMC_CS = low */
-#define	CS_HIGH()		  1==1	    /* Set MMC_CS = high */
-#define MMC_CD			  1	        /* Test if card detected.   yes:true, no:false, default:true */
-#define MMC_WP			  0	        /* Test if write protected. yes:true, no:false, default:false */
-#define	FCLK_SLOW()		200000	  /* Set SPI clock for initialization (100-400kHz) */
-#define	FCLK_FAST()		200000	  /* Set SPI clock for read/write (20MHz max) */
+#define CS_LOW()      1==1      /* Set MMC_CS = low */
+#define CS_HIGH()     1==1      /* Set MMC_CS = high */
+#define MMC_CD        1         /* Test if card detected.   yes:true, no:false, default:true */
+#define MMC_WP        0         /* Test if write protected. yes:true, no:false, default:false */
+// system clock = 8MHz
+/* Set SPI clock for initialization (100-400kHz)(250kHz) */
+#define FCLK_SLOW()   SPCR &= 0xFF & !_BV(SPR0); SPCR |= 0x00 & _BV(SPR1); SPSR |= 0x00 | _BV(SPI2X)
+/* Set SPI clock for read/write (20MHz max)(4MHz) */
+#define FCLK_FAST()   SPCR &= 0xFF & !_BV(SPR1) & !_BV(SPR0); SPSR |= 0x00 | _BV(SPI2X)
 
 
 /*--------------------------------------------------------------------------
