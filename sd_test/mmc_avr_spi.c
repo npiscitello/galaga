@@ -17,8 +17,8 @@
 #include "mmc_avr.h"
 
 /* Peripheral controls (Platform dependent) */
-#define CS_LOW()      1==1      /* Set MMC_CS = low */
-#define CS_HIGH()     1==1      /* Set MMC_CS = high */
+#define CS_LOW()      PORTB &= !_BV(PORTB2)      /* Set MMC_CS = low */
+#define CS_HIGH()     PORTB |= _BV(PORTB2)      /* Set MMC_CS = high */
 #define MMC_CD        1         /* Test if card detected.   yes:true, no:false, default:true */
 #define MMC_WP        0         /* Test if write protected. yes:true, no:false, default:false */
 // system clock = 8MHz
@@ -79,16 +79,15 @@ BYTE CardType;			/* Card type flags (b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressi
 static
 void power_on (void)
 {
-	/* Trun socket power on and wait for 10ms+ (nothing to do if no power controls) */
-	//To be filled
-
+	/* Turn socket power on and wait for 10ms+ (nothing to do if no power controls) */
+  // socket power always on (testing)
 
 	/* Configure MOSI/MISO/SCLK/CS pins */
-	//To be filled
-
+  DDRB |= _BV(DDB2);
 
 	/* Enable SPI module in SPI mode 0 */
-	//To be filled
+  SPCR &= !_BV(CPOL) & !_BV(CPHA);
+  PRR &= !_BV(PRSPI);
 }
 
 
@@ -96,15 +95,15 @@ static
 void power_off (void)
 {
 	/* Disable SPI function */
-	//To be filled
+  PRR |= _BV(PRSPI);
 
 
 	/* De-configure MOSI/MISO/SCLK/CS pins (set hi-z) */
-	//To be filled
+  // don't need to do anything (testing)
 
 
 	/* Trun socket power off (nothing to do if no power controls) */
-	//To be filled
+  // socket power always on (testing)
 }
 
 
