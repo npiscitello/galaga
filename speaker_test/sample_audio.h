@@ -1201,5 +1201,3 @@ const uint8_t PROGMEM audio_samples[] = {
 0x7F,0x80,0x7F
 };
 #endif
-
-#endif
