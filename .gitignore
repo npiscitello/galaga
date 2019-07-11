@@ -11,3 +11,16 @@
 fatfs/documents
 *.zip
 fatfs_samples/
+
+*.jpg
+*.stl
+*.gcode
+*.mp3
+*.pcm
+features.txt
+*.FCStd1
+*.blend
+*.blend1
+*.png
+!sprite.png
+*.bak

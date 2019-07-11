@@ -7,3 +7,12 @@ rate of 31250, split into mono and delete one channel, then export the audio to 
 
 # FAT Driver
 FatFS driver - see http://elm-chan.org/fsw/ff/00index_e.html (may take a while to load)
+
+# KiCAD
+Required libraries (may not be an all-inclusive list...):
+ * custom library, bundled in this repo
+ * Device
+ * Connector
+ * MCU_Microchip_ATmega
+ * Amplifier_Audio
+ * Regulator_Linear
