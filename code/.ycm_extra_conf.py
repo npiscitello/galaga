@@ -51,7 +51,8 @@ flags = [
 '-x', 'c',
 # AVR Include files
 '-isystem', '/usr/avr/include',
-'-isystem', './fatfs/source'
+'-isystem', './fatfs/source',
+'-isystem', './petit_fatfs/source'
 ]
 
 

@@ -15,28 +15,20 @@ void clr_mask( volatile uint8_t* reg, uint8_t mask ) {
 
 // set up Timer0 to tick once every quarter millisecond
 void timer0_setup(void) {
-
   // disable interrupts globally for setup
   cli();
-
   // turn on timer 0
   clr_mask(&PRR, _BV(PRTIM0));
-
   // set CTC mode
   set_mask(&TCCR0A, _BV(WGM01));
-
   // set prescaler = 8 (1 MHz w/ 8 MHz system clock)
   set_mask(&TCCR0B, _BV(CS01));
-
   // set reset point (250 ticks counts out 0.25 ms at 1 MHz)
   OCR0A = 250;
-
   // enable timer 1 interrupts
   set_mask(&TIMSK0, _BV(OCIE0A));
-
   // enable global interrupts
   sei();
-
   return;
 }
 
@@ -49,7 +41,7 @@ ISR(TIMER0_COMPA_vect) {
     ticks_10ms++;
     // it's safe to call this in an ISR cuz it just updates variables
     // also, it works so why not? <shrug>
-    disk_timerproc();
+    //disk_timerproc();
     // heartbeat (debugging)
     //PORTD ^= _BV(PORTD0);
   }
