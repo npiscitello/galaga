@@ -62,13 +62,23 @@ int main(void) {
 
   timer0_setup();
 
+
+  FRESULT res;
+  FATFS fs;
+  //FIL led_file;
+
   while(1) {
+
+    if( ticks_10ms == 95 ) {
+      clr_mask(&PORTD, 0xFF);
+      set_mask(&PORTD, _BV(PORTD0));
+    }
 
     // try to connect to the chip every second
     if( ticks_10ms >= 100 ) {
       ticks_10ms = 0;
-      FATFS fs;
-      FRESULT res = f_mount( &fs, "", 1);
+      clr_mask(&PORTD, _BV(PORTD0));
+      res = f_mount( &fs, "", 1);
       switch( res ) {
         case FR_INVALID_DRIVE:
           set_mask(&PORTD, _BV(PORTD1));
@@ -93,6 +103,7 @@ int main(void) {
           break;
       }
 
+      /*
       FIL led_file;
       res = f_open( &led_file, "/led_on.txt", FA_OPEN_EXISTING );
       switch( res ) {
@@ -133,6 +144,7 @@ int main(void) {
         default:
           break;
       }
+    */
     }
   }
 }
