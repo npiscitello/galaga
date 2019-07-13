@@ -13,13 +13,64 @@
 #define CS_LOW()	PORTB &= ~_BV(3)	/* Set CS low */
 #define	CS_HIGH()	PORTB |=  _BV(3)	/* Set CS high */
 #define	IS_CS_LOW	!(PINB & _BV(3))	/* Test if CS is low */
-#define	FORWARD(d)	xmit(d)				/* Data streaming function (console out) */
 
-void xmit (char);			/* suart.S: Send a byte via software UART */
+#define FCLK_SLOW() SPCR = 0x53   /* Set slow clock (F_CPU / 64) */
+#define FCLK_FAST() SPCR = 0x50   /* Set fast clock (F_CPU / 2) */
+
 void dly_100us (void);		/* usi.S: Delay 100 microseconds */
-void init_spi (void);		/* usi.S: Initialize MMC control ports */
-void xmit_spi (BYTE d);		/* usi.S: Send a byte to the MMC */
-BYTE rcv_spi (void);		/* usi.S: Send a 0xFF to the MMC and get the received byte */
+void init_spi (void);		  /* usi.S: Initialize MMC control ports */
+void xmit_spi (BYTE d);   /* usi.S: Send a byte to the MMC */
+BYTE rcv_spi (void);		  /* usi.S: Send a 0xFF to the MMC and get the received byte */
+
+/* function implementations */
+void dly_100us( void ) {
+  // this project runs on an 8 MHz clock
+  // turn on timer 2
+  PRR &= ~_BV(PRTIM2);
+  // set CTC mode
+  TCCR2A = _BV(WGM21);
+  // set prescaler = 8 (1 MHz)
+  TCCR2B = _BV(CS21);
+  // 1 tick per microsecond
+  OCR2A = 100;
+  // reset counter
+  TCNT2 = 0;
+  TIFR2 = 0xFF;
+  // wait for counter to trip
+  while( !(TIFR2 & _BV(OCF2A)) ) {}
+  // reset counter
+  TIFR2 = 0xFF;
+  // turn off counter
+  PRR |= _BV(PRTIM2);
+  return;
+}
+
+void init_spi( void ) {
+  // outputs
+  DDRB |= _BV(DDB2) | _BV(DDB3) | _BV(DDB5);
+
+  // turn on and configure SPI peripheral
+  PRR &= ~_BV(PRSPI);
+  SPCR = _BV(SPE) | _BV(MSTR) | _BV(SPR1) | _BV(SPR0);
+  SPSR = _BV(SPI2X);
+
+  // use slow clock - figure out how to up the speed if we need to later
+  FCLK_SLOW();
+
+  return;
+}
+
+void xmit_spi( BYTE d ) {
+  SPDR = d;
+  while( !(SPSR & SPIF) ) {}
+  SPSR |= _BV(SPIF);
+  return;
+}
+
+BYTE rcv_spi( void ) {
+  xmit_spi(0xFF);
+  return SPDR;
+}
 
 
 /*--------------------------------------------------------------------------
@@ -185,15 +236,9 @@ DRESULT disk_readp (
 			while (offset--) rcv_spi();
 
 			/* Receive a part of the sector */
-			if (buff) {	/* Store data to the memory */
-				do {
-					*buff++ = rcv_spi();
-				} while (--count);
-			} else {	/* Forward data to the outgoing stream */
-				do {
-					FORWARD(rcv_spi());
-				} while (--count);
-			}
+      do {
+        *buff++ = rcv_spi();
+      } while (--count);
 
 			/* Skip trailing bytes in the sector and block CRC */
 			do rcv_spi(); while (--bc);

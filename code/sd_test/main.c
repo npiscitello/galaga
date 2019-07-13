@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "ff.h"
+#include "pff.h"
 #include "diskio.h"
 
 void set_mask( volatile uint8_t* reg, uint8_t mask ) {
@@ -39,11 +39,6 @@ ISR(TIMER0_COMPA_vect) {
   if( ticks_250us >= 40 ) {
     ticks_250us = 0;
     ticks_10ms++;
-    // it's safe to call this in an ISR cuz it just updates variables
-    // also, it works so why not? <shrug>
-    //disk_timerproc();
-    // heartbeat (debugging)
-    //PORTD ^= _BV(PORTD0);
   }
 }
 
@@ -54,10 +49,8 @@ int main(void) {
 
   timer0_setup();
 
-
   FRESULT res;
   FATFS fs;
-  //FIL led_file;
 
   while(1) {
 
@@ -70,73 +63,43 @@ int main(void) {
     if( ticks_10ms >= 100 ) {
       ticks_10ms = 0;
       clr_mask(&PORTD, _BV(PORTD0));
-      res = f_mount( &fs, "", 1);
+      res = pf_mount( &fs );
       switch( res ) {
-        case FR_INVALID_DRIVE:
+        case FR_OK:
           set_mask(&PORTD, _BV(PORTD1));
           break;
         case FR_DISK_ERR:
           set_mask(&PORTD, _BV(PORTD2));
           break;
-        case FR_NOT_READY:
-         set_mask(&PORTD, _BV(PORTD3));
-          break;
-        case FR_NOT_ENABLED:
-          set_mask(&PORTD, _BV(PORTD4));
-          break;
         case FR_NO_FILESYSTEM:
-          set_mask(&PORTD, _BV(PORTD5));
+          set_mask(&PORTD, _BV(PORTD1) | _BV(PORTD2));
           break;
-        case FR_OK:
-          set_mask(&PORTD, _BV(PORTD6));
+        case FR_NOT_READY:
+          set_mask(&PORTD, _BV(PORTD3));
           break;
         default:
-          set_mask(&PORTD, _BV(PORTD7));
+          set_mask(&PORTD, _BV(PORTD3) | _BV(PORTD1));
           break;
       }
 
-      /*
-      FIL led_file;
-      res = f_open( &led_file, "/led_on.txt", FA_OPEN_EXISTING );
+      res = pf_open( "/led_on.txt" );
       switch( res ) {
+        case FR_OK:
+          set_mask(&PORTD, _BV(PORTD5));
+          break;
         case FR_DISK_ERR:
-          break;
-        case FR_INT_ERR:
-          break;
-        case FR_NOT_READY:
+          set_mask(&PORTD, _BV(PORTD6));
           break;
         case FR_NO_FILE:
-          break;
-        case FR_NO_PATH:
-          break;
-        case FR_INVALID_NAME:
-          break;
-        case FR_DENIED:
-          break;
-        case FR_EXIST:
-          break;
-        case FR_INVALID_OBJECT:
-          break;
-        case FR_WRITE_PROTECTED:
-          break;
-        case FR_INVALID_DRIVE:
+          set_mask(&PORTD, _BV(PORTD6) | _BV(PORTD5));
           break;
         case FR_NOT_ENABLED:
-          break;
-        case FR_NO_FILESYSTEM:
-          break;
-        case FR_TIMEOUT:
-          break;
-        case FR_LOCKED:
-          break;
-        case FR_NOT_ENOUGH_CORE:
-          break;
-        case FR_TOO_MANY_OPEN_FILES:
+          set_mask(&PORTD, _BV(PORTD7));
           break;
         default:
+          set_mask(&PORTD, _BV(PORTD7) | _BV(PORTD5));
           break;
       }
-    */
     }
   }
 }

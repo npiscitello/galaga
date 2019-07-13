@@ -81,8 +81,8 @@ OBJDIR = .
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c	\
-			./mmc_avr.c 	\
-			../fatfs/source/ff.c
+			./avr_mmcp.c 	\
+			../petit_fatfs/source/pff.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
@@ -116,7 +116,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = ../fatfs/source
+EXTRAINCDIRS = ../petit_fatfs/source
 
 
 # Compiler flag to set the C Standard level.
