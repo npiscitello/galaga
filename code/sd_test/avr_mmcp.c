@@ -10,12 +10,12 @@
 
 #include <avr/io.h>			/* Device specific include files */
 
-#define CS_LOW()	PORTB &= ~_BV(3)	/* Set CS low */
-#define	CS_HIGH()	PORTB |=  _BV(3)	/* Set CS high */
-#define	IS_CS_LOW	!(PINB & _BV(3))	/* Test if CS is low */
+#define CS_LOW()	PORTB &= ~_BV(PORTB2)	/* Set CS low */
+#define	CS_HIGH()	PORTB |=  _BV(PORTB2)	/* Set CS high */
+#define	IS_CS_LOW	!(PINB & _BV(PINB2))	/* Test if CS is low */
 
-#define FCLK_SLOW() SPCR = 0x53   /* Set slow clock (F_CPU / 64) */
-#define FCLK_FAST() SPCR = 0x50   /* Set fast clock (F_CPU / 2) */
+#define FCLK_SLOW() SPCR |= _BV(SPR1) | _BV(SPR0)   /* Set slow clock (F_CPU / 64) */
+#define FCLK_FAST() SPCR &= ~_BV(SPR1) & ~_BV(SPR0)   /* Set fast clock (F_CPU / 2) */
 
 void dly_100us (void);		/* usi.S: Delay 100 microseconds */
 void init_spi (void);		  /* usi.S: Initialize MMC control ports */
@@ -80,22 +80,26 @@ BYTE rcv_spi( void ) {
 ---------------------------------------------------------------------------*/
 
 /* Definitions for MMC/SDC command */
-#define CMD0	(0x40+0)	/* GO_IDLE_STATE */
-#define CMD1	(0x40+1)	/* SEND_OP_COND (MMC) */
-#define	ACMD41	(0xC0+41)	/* SEND_OP_COND (SDC) */
-#define CMD8	(0x40+8)	/* SEND_IF_COND */
-#define CMD16	(0x40+16)	/* SET_BLOCKLEN */
-#define CMD17	(0x40+17)	/* READ_SINGLE_BLOCK */
-#define CMD24	(0x40+24)	/* WRITE_BLOCK */
-#define CMD55	(0x40+55)	/* APP_CMD */
-#define CMD58	(0x40+58)	/* READ_OCR */
+/* these don't match the full-sized FATFS lib - those are below */
+//#define CMD0	(0x40+0)	/* GO_IDLE_STATE */
+//#define CMD1	(0x40+1)	/* SEND_OP_COND (MMC) */
+//#define	ACMD41	(0xC0+41)	/* SEND_OP_COND (SDC) */
+//#define CMD8	(0x40+8)	/* SEND_IF_COND */
+//#define CMD16	(0x40+16)	/* SET_BLOCKLEN */
+//#define CMD17	(0x40+17)	/* READ_SINGLE_BLOCK */
+//#define CMD24	(0x40+24)	/* WRITE_BLOCK */
+//#define CMD55	(0x40+55)	/* APP_CMD */
+//#define CMD58	(0x40+58)	/* READ_OCR */
 
-
-/* Card type flags (CardType) */
-#define CT_MMC				0x01	/* MMC version 3 */
-#define CT_SD1				0x02	/* SD version 1 */
-#define CT_SD2				0x04	/* SD version 2+ */
-#define CT_BLOCK			0x08	/* Block addressing */
+#define CMD0  (0)     /* GO_IDLE_STATE */
+#define CMD1  (1)     /* SEND_OP_COND (MMC) */
+#define ACMD41  (0x80+41) /* SEND_OP_COND (SDC) */
+#define CMD8  (8)     /* SEND_IF_COND */
+#define CMD16 (16)    /* SET_BLOCKLEN */
+#define CMD17 (17)    /* READ_SINGLE_BLOCK */
+#define CMD24 (24)    /* WRITE_BLOCK */
+#define CMD55 (55)    /* APP_CMD */
+#define CMD58 (58)    /* READ_OCR */
 
 
 static BYTE CardType;
