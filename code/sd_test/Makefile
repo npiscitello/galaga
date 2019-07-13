@@ -81,8 +81,7 @@ OBJDIR = .
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c	\
-			./mmc_avr_spi.c 	\
-			./diskio.c \
+			./mmc_avr.c 	\
 			../fatfs/source/ff.c
 
 
@@ -434,7 +433,8 @@ end:
 
 # Display size of file.
 HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
-ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
+#ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
+ELFSIZE = $(SIZE) $(TARGET).elf
 
 sizebefore:
 	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); \
