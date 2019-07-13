@@ -37,7 +37,7 @@ void dly_100us( void ) {
   TCNT2 = 0;
   TIFR2 = 0xFF;
   // wait for counter to trip
-  while( !(TIFR2 & _BV(OCF2A)) ) {}
+  loop_until_bit_is_set(TIFR2, OCF2A);
   // reset counter
   TIFR2 = 0xFF;
   // turn off counter
@@ -62,7 +62,7 @@ void init_spi( void ) {
 
 void xmit_spi( BYTE d ) {
   SPDR = d;
-  while( !(SPSR & SPIF) ) {}
+  loop_until_bit_is_set(SPSR, SPIF);
   SPSR |= _BV(SPIF);
   return;
 }
@@ -80,26 +80,15 @@ BYTE rcv_spi( void ) {
 ---------------------------------------------------------------------------*/
 
 /* Definitions for MMC/SDC command */
-/* these don't match the full-sized FATFS lib - those are below */
-//#define CMD0	(0x40+0)	/* GO_IDLE_STATE */
-//#define CMD1	(0x40+1)	/* SEND_OP_COND (MMC) */
-//#define	ACMD41	(0xC0+41)	/* SEND_OP_COND (SDC) */
-//#define CMD8	(0x40+8)	/* SEND_IF_COND */
-//#define CMD16	(0x40+16)	/* SET_BLOCKLEN */
-//#define CMD17	(0x40+17)	/* READ_SINGLE_BLOCK */
-//#define CMD24	(0x40+24)	/* WRITE_BLOCK */
-//#define CMD55	(0x40+55)	/* APP_CMD */
-//#define CMD58	(0x40+58)	/* READ_OCR */
-
-#define CMD0  (0)     /* GO_IDLE_STATE */
-#define CMD1  (1)     /* SEND_OP_COND (MMC) */
-#define ACMD41  (0x80+41) /* SEND_OP_COND (SDC) */
-#define CMD8  (8)     /* SEND_IF_COND */
-#define CMD16 (16)    /* SET_BLOCKLEN */
-#define CMD17 (17)    /* READ_SINGLE_BLOCK */
-#define CMD24 (24)    /* WRITE_BLOCK */
-#define CMD55 (55)    /* APP_CMD */
-#define CMD58 (58)    /* READ_OCR */
+#define CMD0	(0x40+0)	/* GO_IDLE_STATE */
+#define CMD1	(0x40+1)	/* SEND_OP_COND (MMC) */
+#define	ACMD41	(0xC0+41)	/* SEND_OP_COND (SDC) */
+#define CMD8	(0x40+8)	/* SEND_IF_COND */
+#define CMD16	(0x40+16)	/* SET_BLOCKLEN */
+#define CMD17	(0x40+17)	/* READ_SINGLE_BLOCK */
+#define CMD24	(0x40+24)	/* WRITE_BLOCK */
+#define CMD55	(0x40+55)	/* APP_CMD */
+#define CMD58	(0x40+58)	/* READ_OCR */
 
 
 static BYTE CardType;
