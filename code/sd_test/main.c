@@ -82,7 +82,7 @@ int main(void) {
           break;
       }
 
-      res = pf_open( "led_on.txt" );
+      res = pf_open( "LED_ON.TXT" );
       switch( res ) {
         case FR_OK:
           set_mask(&PORTD, _BV(PORTD5));
