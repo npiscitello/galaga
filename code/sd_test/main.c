@@ -3,6 +3,14 @@
 #include "pff.h"
 #include "diskio.h"
 
+#define ASCII_1 0x31
+#define ASCII_2 0x32
+#define ASCII_3 0x33
+#define ASCII_4 0x34
+#define ASCII_5 0x35
+#define ASCII_6 0x36
+#define ASCII_7 0x37
+
 void set_mask( volatile uint8_t* reg, uint8_t mask ) {
   *reg |= mask;
   return;
@@ -42,6 +50,27 @@ ISR(TIMER0_COMPA_vect) {
   }
 }
 
+// oooooo this global feels really wrong but oh well
+unsigned int* NULL;
+FRESULT sd_ops(uint8_t* file_data, uint8_t file_data_len) {
+  FATFS fs;
+  FRESULT res;
+
+  res = pf_mount( &fs );
+  if( res != FR_OK ) {
+    return res;
+  }
+
+  res = pf_open( "LED_ON.TXT" );
+  if( res != FR_OK ) {
+    return res;
+  }
+
+  res = pf_read( file_data, file_data_len,  NULL );
+
+  return res;
+}
+
 int main(void) {
 
   // PortD - LED output
@@ -49,56 +78,55 @@ int main(void) {
 
   timer0_setup();
 
+  uint8_t led_byte;
   FRESULT res;
-  FATFS fs;
 
   while(1) {
 
-    if( ticks_10ms == 95 ) {
+    // show when the second is about to trigger
+    if( ticks_10ms == 90 ) {
       clr_mask(&PORTD, 0xFF);
       set_mask(&PORTD, _BV(PORTD0));
     }
+    if( ticks_10ms == 95 ) {
+      clr_mask(&PORTD, _BV(PORTD0));
+    }
 
-    // try to connect to the chip every second
+    // update the outputs every second
     if( ticks_10ms >= 100 ) {
       ticks_10ms = 0;
-      clr_mask(&PORTD, _BV(PORTD0));
-      res = pf_mount( &fs );
-      switch( res ) {
-        case FR_OK:
-          set_mask(&PORTD, _BV(PORTD1));
-          break;
-        case FR_DISK_ERR:
-          set_mask(&PORTD, _BV(PORTD2));
-          break;
-        case FR_NO_FILESYSTEM:
-          set_mask(&PORTD, _BV(PORTD1) | _BV(PORTD2));
-          break;
-        case FR_NOT_READY:
-          set_mask(&PORTD, _BV(PORTD3));
-          break;
-        default:
-          set_mask(&PORTD, _BV(PORTD3) | _BV(PORTD1));
-          break;
-      }
-
-      res = pf_open( "LED_ON.TXT" );
-      switch( res ) {
-        case FR_OK:
-          set_mask(&PORTD, _BV(PORTD5));
-          break;
-        case FR_DISK_ERR:
-          set_mask(&PORTD, _BV(PORTD6));
-          break;
-        case FR_NO_FILE:
-          set_mask(&PORTD, _BV(PORTD6) | _BV(PORTD5));
-          break;
-        case FR_NOT_ENABLED:
-          set_mask(&PORTD, _BV(PORTD7));
-          break;
-        default:
-          set_mask(&PORTD, _BV(PORTD7) | _BV(PORTD5));
-          break;
+      res = sd_ops(&led_byte, 1);
+      if( res == FR_OK ) {
+        uint8_t msk_led;
+        switch( led_byte ) {
+          case ASCII_1:
+            msk_led = _BV(1);
+            break;
+          case ASCII_2:
+            msk_led = _BV(2);
+            break;
+          case ASCII_3:
+            msk_led = _BV(3);
+            break;
+          case ASCII_4:
+            msk_led = _BV(4);
+            break;
+          case ASCII_5:
+            msk_led = _BV(5);
+            break;
+          case ASCII_6:
+            msk_led = _BV(6);
+            break;
+          case ASCII_7:
+            msk_led = _BV(7);
+            break;
+          default:
+            msk_led = 0xFE;
+        }
+        set_mask(&PORTD, msk_led);
+       } else {
+        set_mask(&PORTD, _BV(PORTD0));
+        clr_mask(&PORTD, ~_BV(PORTD0));
       }
     }
   }
