@@ -54,8 +54,8 @@ void init_spi( void ) {
   SPCR = _BV(SPE) | _BV(MSTR) | _BV(SPR1) | _BV(SPR0);
   SPSR = _BV(SPI2X);
 
-  // use slow clock - figure out how to up the speed if we need to later
-  FCLK_SLOW();
+  // gotta go fAST
+  FCLK_FAST();
 
   return;
 }
