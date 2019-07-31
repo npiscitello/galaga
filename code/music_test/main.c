@@ -7,7 +7,7 @@
 #define PWM_RESOLUTION 0x00FF
 
 // how many bytes are in each of the double buffers
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 512
 
 #define TRY_SD_OP(A) if( A != FR_OK ) { error_exit(); }
 
@@ -15,6 +15,14 @@ volatile uint8_t flags = 0x00;
 #define MSK_FLAG_SD_READING       0x01
 #define MSK_FLAG_BUFFER_SWAPPED   0x02
 #define MSK_FLAG_END_OF_FILE      0x04
+
+// there's gotta be a better way to do this than using so many globals
+// the active buffer with audio data
+volatile uint8_t* buf_read;
+// the secondary buffer being loaded with data from the SD card
+volatile uint8_t* buf_load;
+// which sample is currently being read from that sample buffer
+volatile uint16_t sample_index = 0;
 
 void set_mask( volatile uint8_t* reg, uint8_t mask ) {
   *reg |= mask;
@@ -26,15 +34,20 @@ void clr_mask( volatile uint8_t* reg, uint8_t mask ) {
   return;
 }
 
-void stop_PWM() {
+void stop_PWM(void) {
   clr_mask(&TCCR1B, _BV(CS12) | _BV(CS11) | _BV(CS10));
 }
 
-void start_PWM() {
+void start_PWM(void) {
   set_mask(&TCCR1B, _BV(CS10));
 }
 
-void setup_timer1() {
+void error_exit(void) {
+  set_mask(&PORTD, _BV(PORTD0));
+  exit(1);
+}
+
+void setup_timer1(void) {
   // disable interrupts globally for setup
   cli();
 
@@ -72,17 +85,11 @@ void swap_buffers( volatile uint8_t** label_a, volatile uint8_t** label_b ) {
   return;
 }
 
-// there's gotta be a better way to do this than using so many globals
-// the active buffer with audio data
-volatile uint8_t* buf_read;
-// the secondary buffer being loaded with data from the SD card
-volatile uint8_t* buf_load;
-// which sample is currently being read from that sample buffer
-volatile uint16_t sample_index = 0;
 
 // pump out a sample. If the SD card is still filling the other buffer, idle on the current
 // sample until its done.
 ISR(TIMER1_OVF_vect) {
+  set_mask(&PORTD, _BV(PORTD7));
   OCR1AL = *(buf_read + sample_index);
   sample_index++;
   if( sample_index >= BUFFER_SIZE ) {
@@ -93,11 +100,6 @@ ISR(TIMER1_OVF_vect) {
       swap_buffers(&buf_read, &buf_load);
     }
   }
-}
-
-void error_exit() {
-  set_mask(&PORTD, _BV(PORTD0));
-  exit(1);
 }
 
 void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
@@ -114,7 +116,7 @@ void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
 int main(void) {
 
   // prepare timer1
-  //setup_timer1();
+  setup_timer1();
   // make sure we're not running the audio output
   stop_PWM();
 
@@ -124,20 +126,19 @@ int main(void) {
   // set up buffers
   buf_read = malloc(BUFFER_SIZE);
   buf_load = malloc(BUFFER_SIZE);
-  if( buf_read == 0 || buf_load == 0 ) {
+  if( (buf_read == 0) || (buf_load == 0) ) {
     error_exit();
   }
-  set_mask(&PORTD, PORTD1);
+  set_mask(&PORTD, _BV(PORTD1));
 
-  /*
   // pre-load buffer
   FATFS fs;
   TRY_SD_OP( pf_mount( &fs ) );
-  set_mask(&PORTD, PORTD2);
-  TRY_SD_OP( pf_open( "SOMEWHERE_IN_THE_BETWEEN.PCM" ) );
-  set_mask(&PORTD, PORTD3);
+  set_mask(&PORTD, _BV(PORTD2));
+  TRY_SD_OP( pf_open( "SITB.PCM" ) );
+  set_mask(&PORTD, _BV(PORTD3));
   read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
-  set_mask(&PORTD, PORTD4);
+  set_mask(&PORTD, _BV(PORTD4));
 
   // kick off audio
   swap_buffers(&buf_read, &buf_load);
@@ -148,15 +149,14 @@ int main(void) {
     if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
       clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
       read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
-      set_mask(&PORTD, PORTD5);
+      set_mask(&PORTD, _BV(PORTD5));
     }
     
     // if we hit the end of the file, reset the read pointer
     if( flags & MSK_FLAG_END_OF_FILE ) {
       // zero out the rest of the buffer if the noise is bad
       TRY_SD_OP( pf_lseek(0) );
-      set_mask(&PORTD, PORTD6);
+      set_mask(&PORTD, _BV(PORTD6));
     }
   }
-  */
 }
