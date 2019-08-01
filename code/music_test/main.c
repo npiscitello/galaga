@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "pff.h"
 #include "diskio.h"
+#include "utils.h"
 
 #define PWM_RESOLUTION 0x00FF
 
@@ -24,36 +25,13 @@ volatile uint8_t* buf_load;
 // which sample is currently being read from that sample buffer
 volatile uint16_t sample_index = 0;
 
-void set_mask( volatile uint8_t* reg, uint8_t mask ) {
-  *reg |= mask;
-  return;
-}
 
-void clr_mask( volatile uint8_t* reg, uint8_t mask ) {
-  *reg &= ~mask;
-  return;
-}
-
-void stop_PWM(void) {
-  clr_mask(&TCCR1B, _BV(CS12) | _BV(CS11) | _BV(CS10));
-}
-
-void start_PWM(void) {
-  set_mask(&TCCR1B, _BV(CS10));
-}
-
-void error_exit(void) {
-  set_mask(&PORTD, _BV(PORTD0));
-  exit(1);
-}
 
 void setup_timer1(void) {
   // disable interrupts globally for setup
   cli();
-
   // set OC1A (PB1) to output
   DDRB = 0x00 | _BV(DDB1);
-
   // turn on timer 1
   PRR = 0xFF & !_BV(PRTIM1);
 
@@ -77,30 +55,7 @@ void setup_timer1(void) {
   sei();
 }
 
-void swap_buffers( volatile uint8_t** label_a, volatile uint8_t** label_b ) {
-  volatile uint8_t* placeholder = *label_a;
-  *label_a = *label_b;
-  *label_b = placeholder;
-  set_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
-  return;
-}
 
-
-// pump out a sample. If the SD card is still filling the other buffer, idle on the current
-// sample until its done.
-ISR(TIMER1_OVF_vect) {
-  set_mask(&PORTD, _BV(PORTD7));
-  OCR1AL = *(buf_read + sample_index);
-  sample_index++;
-  if( sample_index >= BUFFER_SIZE ) {
-    if( flags & MSK_FLAG_SD_READING ) {
-      sample_index--;
-    } else {
-      sample_index = 0;
-      swap_buffers(&buf_read, &buf_load);
-    }
-  }
-}
 
 void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
   UINT bytes_read = 0;
@@ -113,6 +68,26 @@ void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
   return;
 }
 
+
+
+// pump out a sample. If the SD card is still filling the other buffer, idle on the current
+// sample until its done.
+ISR(TIMER1_OVF_vect) {
+  OCR1AL = *(buf_read + sample_index);
+  sample_index++;
+  if( sample_index >= BUFFER_SIZE ) {
+    if( flags & MSK_FLAG_SD_READING ) {
+      sample_index--;
+    } else {
+      sample_index = 0;
+      swap_buffers(&buf_read, &buf_load);
+      set_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
+    }
+  }
+}
+
+
+
 int main(void) {
 
   // prepare timer1
@@ -120,7 +95,7 @@ int main(void) {
   // make sure we're not running the audio output
   stop_PWM();
 
-  // enable output for err light
+  // enable output for debug lights
   DDRD = 0xFF;
 
   // set up buffers
@@ -147,15 +122,15 @@ int main(void) {
   while(1) {
     // load new data every time the buffers swap
     if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
-      clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
       read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
+      clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
       set_mask(&PORTD, _BV(PORTD5));
     }
     
     // if we hit the end of the file, reset the read pointer
     if( flags & MSK_FLAG_END_OF_FILE ) {
-      // zero out the rest of the buffer if the noise is bad
       TRY_SD_OP( pf_lseek(0) );
+      clr_mask(&flags, MSK_FLAG_END_OF_FILE);
       set_mask(&PORTD, _BV(PORTD6));
     }
   }
