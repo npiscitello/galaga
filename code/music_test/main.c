@@ -7,6 +7,9 @@
 
 #define PWM_RESOLUTION 0x00FF
 
+// used to test the self-power-off function
+#define PWR_CONTROL 1
+
 // how many bytes are in each of the double buffers
 #define BUFFER_SIZE 512
 
@@ -98,6 +101,11 @@ int main(void) {
   // enable output for debug lights
   DDRD = 0xFF;
 
+#if PWR_CONTROL
+  set_mask(&DDRB, _BV(DDB6));
+  clr_mask(&PORTB, _BV(PORTB6));
+#endif
+
   // set up buffers
   buf_read = malloc(BUFFER_SIZE);
   buf_load = malloc(BUFFER_SIZE);
@@ -132,6 +140,11 @@ int main(void) {
       TRY_SD_OP( pf_lseek(0) );
       clr_mask(&flags, MSK_FLAG_END_OF_FILE);
       set_mask(&PORTD, _BV(PORTD6));
+
+#if PWR_CONTROL
+      // put PB6 high to turn off the power
+      set_mask(&PORTB, _BV(PORTB6));
+#endif
     }
   }
 }
