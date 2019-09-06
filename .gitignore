@@ -24,3 +24,5 @@ features.txt
 *.png
 !sprite.png
 *.bak
+*-bak
+*.net

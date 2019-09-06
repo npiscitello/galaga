@@ -1,4 +1,5 @@
 EESchema Schematic File Version 4
+LIBS:galaga-cache
 EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
@@ -54,7 +55,7 @@ U 1 1 5BB68AD9
 P 8350 2900
 F 0 "U4" H 8381 3425 50  0000 C CNN
 F 1 "BOB-00544" H 8381 3334 50  0000 C CNN
-F 2 "custom:bob-00544" H 8300 3900 50  0001 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical" H 8300 3900 50  0001 C CNN
 F 3 "" H 8300 3900 50  0001 C CNN
 	1    8350 2900
 	-1   0    0    1   
@@ -146,8 +147,6 @@ Wire Wire Line
 	7750 2700 7750 2200
 Wire Wire Line
 	7750 2200 6050 2200
-Wire Wire Line
-	7550 3200 8100 3200
 Text GLabel 8050 3000 0    50   Input ~ 0
 DGND
 Wire Wire Line
@@ -252,22 +251,14 @@ Wire Wire Line
 	6050 3200 6400 3200
 Wire Wire Line
 	6050 3300 6400 3300
-Wire Wire Line
-	7550 3200 7550 3900
-Wire Wire Line
-	6050 3900 7550 3900
 Text HLabel 8050 2600 0    50   Input ~ 0
 sd_cs
 Wire Wire Line
 	8050 2600 8100 2600
-Text HLabel 6100 4000 2    50   Input ~ 0
+Text HLabel 6100 2100 2    50   Input ~ 0
 sd_cs
-Wire Wire Line
-	6050 4000 6100 4000
 Text Label 7200 2200 0    50   ~ 0
 sd_di
-Text Label 7550 3300 0    50   ~ 0
-sd_cd
 Text Label 7200 2400 0    50   ~ 0
 sd_sck
 Text Label 7200 2300 0    50   ~ 0
@@ -295,17 +286,6 @@ F 3 "~" H 6600 3500 50  0001 C CNN
 	1    6600 3500
 	1    0    0    -1  
 $EndComp
-$Comp
-L Device:R_POT RV1
-U 1 1 5C58E151
-P 7000 2000
-F 0 "RV1" V 6886 2000 50  0001 C CNN
-F 1 "1k" V 7000 2000 50  0000 C CNN
-F 2 "Potentiometer_THT:Potentiometer_Vishay_T7-YA_Single_Vertical" H 7000 2000 50  0001 C CNN
-F 3 "~" H 7000 2000 50  0001 C CNN
-	1    7000 2000
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	6050 2000 6100 2000
 Wire Wire Line
@@ -314,16 +294,6 @@ Wire Wire Line
 	8100 1050 8100 1100
 Wire Wire Line
 	8100 1400 8100 2000
-Wire Wire Line
-	8100 2000 7200 2000
-Wire Wire Line
-	7000 1850 7000 1800
-Wire Wire Line
-	7000 1800 7200 1800
-Wire Wire Line
-	7200 1800 7200 2000
-Wire Wire Line
-	7200 2000 7150 2000
 Text Notes 6200 1600 0    50   ~ 0
 With 3.3v max out of the m328, \nthis guarantees a maximum of \n2.62v into the amp. This would \nclip on full strength signals, but \nit allows us to take advantage of \nthe fact that audio is very rarely \nfull strength.
 Wire Wire Line
@@ -331,10 +301,10 @@ Wire Wire Line
 Wire Wire Line
 	8600 1500 8750 1500
 $Comp
-L Isolator:LTV-817M U?
+L Isolator:LTV-817M U5
 U 1 1 5D708174
 P 2450 2150
-F 0 "U?" H 2450 2475 50  0001 C CNN
+F 0 "U5" H 2450 2475 50  0001 C CNN
 F 1 "LTV-817M" H 2450 2384 50  0001 C CNN
 F 2 "Package_DIP:DIP-4_W10.16mm" H 2450 1850 50  0001 C CNN
 F 3 "http://www.us.liteon.com/downloads/LTV-817-827-847.PDF" H 2050 2450 50  0001 C CNN
@@ -342,50 +312,49 @@ F 3 "http://www.us.liteon.com/downloads/LTV-817-827-847.PDF" H 2050 2450 50  000
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Transistor_FET:2N7000 Q?
+L Transistor_FET:2N7000 Q1
 U 1 1 5D708462
 P 1450 1950
-F 0 "Q?" H 1655 1996 50  0001 L CNN
+F 0 "Q1" H 1655 1996 50  0001 L CNN
 F 1 "2N7000" H 1655 1905 50  0001 L CNN
-F 2 "Package_TO_SOT_THT:TO-92_Inline" H 1650 1875 50  0001 L CIN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 1650 1875 50  0001 L CIN
 F 3 "https://www.fairchildsemi.com/datasheets/2N/2N7000.pdf" H 1450 1950 50  0001 L CNN
 	1    1450 1950
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R2
 U 1 1 5D7084DD
 P 1350 1500
-F 0 "R?" H 1420 1546 50  0000 L CNN
+F 0 "R2" H 1420 1546 50  0000 L CNN
 F 1 "10M" H 1420 1455 50  0000 L CNN
-F 2 "" V 1280 1500 50  0001 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 1280 1500 50  0001 C CNN
 F 3 "~" H 1350 1500 50  0001 C CNN
 	1    1350 1500
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R3
 U 1 1 5D70854B
 P 2750 1650
-F 0 "R?" H 2820 1696 50  0000 L CNN
+F 0 "R3" H 2820 1696 50  0000 L CNN
 F 1 "20K" H 2820 1605 50  0000 L CNN
-F 2 "" V 2680 1650 50  0001 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 2680 1650 50  0001 C CNN
 F 3 "~" H 2750 1650 50  0001 C CNN
 	1    2750 1650
 	1    0    0    -1  
 $EndComp
 $Comp
-L Switch:SW_Push SW?
+L Switch:SW_Push SW1
 U 1 1 5D7085A6
 P 2750 1100
-F 0 "SW?" V 2704 1248 50  0001 L CNN
+F 0 "SW1" V 2704 1248 50  0001 L CNN
 F 1 "SW_Push" V 2795 1248 50  0001 L CNN
-F 2 "" H 2750 1300 50  0001 C CNN
+F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 2750 1300 50  0001 C CNN
 F 3 "" H 2750 1300 50  0001 C CNN
 	1    2750 1100
 	0    1    1    0   
 $EndComp
-Connection ~ 7200 2000
 Wire Wire Line
 	6050 2400 7650 2400
 Connection ~ 8750 1500
@@ -395,8 +364,6 @@ Wire Wire Line
 	8400 1600 8350 1600
 Wire Wire Line
 	8350 1250 8350 1600
-Wire Wire Line
-	6400 2000 6850 2000
 Text GLabel 6400 3400 0    50   Input ~ 0
 DGND
 Wire Wire Line
@@ -471,12 +438,12 @@ Wire Wire Line
 Wire Wire Line
 	1200 2250 1350 2250
 $Comp
-L Device:R R?
+L Device:R R4
 U 1 1 5D77529A
 P 2950 2050
-F 0 "R?" V 2743 2050 50  0000 C CNN
+F 0 "R4" V 2743 2050 50  0000 C CNN
 F 1 "180R" V 2834 2050 50  0000 C CNN
-F 2 "" V 2880 2050 50  0001 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 2880 2050 50  0001 C CNN
 F 3 "~" H 2950 2050 50  0001 C CNN
 	1    2950 2050
 	0    1    1    0   
@@ -501,4 +468,8 @@ Wire Wire Line
 	1350 850  1350 1350
 Wire Wire Line
 	2750 1300 2750 1500
+Wire Wire Line
+	6400 2000 8100 2000
+Wire Wire Line
+	6100 2100 6050 2100
 $EndSCHEMATC
