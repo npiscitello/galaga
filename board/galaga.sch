@@ -194,17 +194,6 @@ F 3 "~" H 8100 1250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R1
-U 1 1 5BBECF45
-P 6250 2000
-F 0 "R1" V 6600 2000 50  0001 R CNN
-F 1 "3.9k" V 6250 2000 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 6180 2000 50  0001 C CNN
-F 3 "~" H 6250 2000 50  0001 C CNN
-	1    6250 2000
-	0    -1   -1   0   
-$EndComp
-$Comp
 L Connector:Screw_Terminal_01x03 J1
 U 1 1 5BC32DBF
 P 6600 2900
@@ -255,7 +244,7 @@ Text HLabel 8050 2600 0    50   Input ~ 0
 sd_cs
 Wire Wire Line
 	8050 2600 8100 2600
-Text HLabel 6100 2100 2    50   Input ~ 0
+Text HLabel 6100 2600 2    50   Input ~ 0
 sd_cs
 Text Label 7200 2200 0    50   ~ 0
 sd_di
@@ -287,15 +276,11 @@ F 3 "~" H 6600 3500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6050 2000 6100 2000
-Wire Wire Line
 	8400 1050 8100 1050
 Wire Wire Line
 	8100 1050 8100 1100
 Wire Wire Line
 	8100 1400 8100 2000
-Text Notes 6200 1600 0    50   ~ 0
-With 3.3v max out of the m328, \nthis guarantees a maximum of \n2.62v into the amp. This would \nclip on full strength signals, but \nit allows us to take advantage of \nthe fact that audio is very rarely \nfull strength.
 Wire Wire Line
 	9000 1150 9050 1150
 Wire Wire Line
@@ -468,8 +453,54 @@ Wire Wire Line
 	1350 850  1350 1350
 Wire Wire Line
 	2750 1300 2750 1500
+$Comp
+L Connector_Generic:Conn_02x03_Odd_Even J6
+U 1 1 5D757B8F
+P 9400 2400
+F 0 "J6" H 9450 2717 50  0000 C CNN
+F 1 "Conn_02x03_Odd_Even" H 9450 2626 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical" H 9400 2400 50  0001 C CNN
+F 3 "~" H 9400 2400 50  0001 C CNN
+	1    9400 2400
+	1    0    0    -1  
+$EndComp
+Connection ~ 7550 2300
+Connection ~ 7650 2400
 Wire Wire Line
-	6400 2000 8100 2000
+	6050 3400 6100 3400
 Wire Wire Line
-	6100 2100 6050 2100
+	6100 3400 6100 3700
+Wire Wire Line
+	6100 3700 8950 3700
+Wire Wire Line
+	8950 3700 8950 2500
+Wire Wire Line
+	8950 2500 9200 2500
+Text GLabel 9800 2300 2    50   Input ~ 0
++3V3
+Wire Wire Line
+	9800 2300 9700 2300
+Text GLabel 9800 2500 2    50   Input ~ 0
+DGND
+Wire Wire Line
+	9800 2500 9700 2500
+Wire Wire Line
+	7650 2400 9200 2400
+Wire Wire Line
+	7550 2300 9200 2300
+Wire Wire Line
+	7750 2200 8900 2200
+Wire Wire Line
+	8900 2200 8900 1950
+Wire Wire Line
+	8900 1950 10150 1950
+Wire Wire Line
+	10150 1950 10150 2400
+Wire Wire Line
+	10150 2400 9700 2400
+Connection ~ 7750 2200
+Wire Wire Line
+	6050 2000 8100 2000
+Wire Wire Line
+	6100 2600 6050 2600
 $EndSCHEMATC

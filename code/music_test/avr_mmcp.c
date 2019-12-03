@@ -10,9 +10,9 @@
 
 #include <avr/io.h>			/* Device specific include files */
 
-#define CS_LOW()	PORTB &= ~_BV(PORTB2)	/* Set CS low */
-#define	CS_HIGH()	PORTB |=  _BV(PORTB2)	/* Set CS high */
-#define	IS_CS_LOW	!(PINB & _BV(PINB2))	/* Test if CS is low */
+#define CS_LOW()	PORTB &= ~_BV(PORTB7)	/* Set CS low */
+#define	CS_HIGH()	PORTB |=  _BV(PORTB7)	/* Set CS high */
+#define	IS_CS_LOW	!(PINB & _BV(PINB7))	/* Test if CS is low */
 
 #define FCLK_SLOW() SPCR |= _BV(SPR1) | _BV(SPR0)   /* Set slow clock (F_CPU / 64) */
 #define FCLK_FAST() SPCR &= ~_BV(SPR1) & ~_BV(SPR0)   /* Set fast clock (F_CPU / 2) */
@@ -47,7 +47,7 @@ void dly_100us( void ) {
 
 void init_spi( void ) {
   // outputs
-  DDRB |= _BV(DDB2) | _BV(DDB3) | _BV(DDB5);
+  DDRB |= _BV(DDB7) | _BV(DDB3) | _BV(DDB5);
 
   // turn on and configure SPI peripheral
   PRR &= ~_BV(PRSPI);

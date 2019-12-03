@@ -4,6 +4,8 @@
 #include <avr/io.h>
 #include <stdlib.h>
 
+unsigned char err = 0;
+
 void set_mask( volatile uint8_t* reg, uint8_t mask ) {
   *reg |= mask;
   return;
@@ -24,7 +26,7 @@ void start_PWM(void) {
 
 void error_exit(void) {
   set_mask(&PORTD, _BV(PORTD0));
-  exit(1);
+  err++;
 }
 
 void swap_buffers( volatile uint8_t** label_a, volatile uint8_t** label_b ) {
