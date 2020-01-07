@@ -19,6 +19,8 @@ const char PROGMEM init[] = "init\r\n";
 const char PROGMEM xmit[] = "xmit\r\n";
 #define LEN_RCV 5
 const char PROGMEM rcv[] = "rcv\r\n";
+#define LEN_LOOP 6
+const char PROGMEM loop[] = "loop\r\n";
 
 #define CS_LOW()	PORTB &= ~_BV(PORTB7)	/* Set CS low */
 #define	CS_HIGH()	PORTB |=  _BV(PORTB7)	/* Set CS high */
@@ -63,9 +65,8 @@ void init_spi( void ) {
 
   // turn on and configure SPI peripheral
   PRR &= ~_BV(PRSPI);
-  SPCR = _BV(MSTR) | _BV(SPR1) | _BV(SPR0);
+  SPCR = _BV(SPE) | _BV(MSTR);
   SPSR = _BV(SPI2X);
-  SPCR = _BV(SPE);
 
   // gotta go fAST
   FCLK_FAST();
@@ -77,10 +78,7 @@ void init_spi( void ) {
 void xmit_spi( BYTE d ) {
   transmit_string_flash(xmit, LEN_XMIT);
   SPDR = d;
-  transmit_string_flash(xmit, LEN_XMIT);
   loop_until_bit_is_set(SPSR, SPIF);
-  // must "access" the SPDR after reading SPSR to clear SPIF
-  //SPDR & 0xFF;
   transmit_string_flash(xmit, LEN_XMIT);
   return;
 }
@@ -181,7 +179,10 @@ DSTATUS disk_initialize (void)
 #endif
 	init_spi();		/* Initialize ports to control MMC */
 	CS_HIGH();
-	for (n = 10; n; n--) rcv_spi();	/* 80 dummy clocks with CS=H */
+	for (n = 10; n; n--) {
+    transmit_string_flash(loop, LEN_LOOP);
+    rcv_spi();	/* 80 dummy clocks with CS=H */
+  }
 
 	ty = 0;
 	if (send_cmd(CMD0, 0) == 1) {			/* GO_IDLE_STATE */
