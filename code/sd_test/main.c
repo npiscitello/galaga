@@ -122,8 +122,6 @@ int main(void) {
   FATFS fs;
   FRESULT res;
 
-  disk_initialize();
-  transmit_string_flash(frs_unknown, LEN_FRS_UNKNOWN);
   do {
   res = pf_mount( &fs );
   } while (res != FR_OK);

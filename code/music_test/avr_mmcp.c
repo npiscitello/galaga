@@ -46,8 +46,9 @@ void dly_100us( void ) {
 }
 
 void init_spi( void ) {
-  // outputs
-  DDRB |= _BV(DDB7) | _BV(DDB3) | _BV(DDB5);
+  // outputs - B2 must be output, otherwise the floating input
+  // pops the chip out of SPI Master mode!
+  DDRB |= _BV(DDB7) | _BV(DDB3) | _BV(DDB5) | _BV(DDB2);
 
   // turn on and configure SPI peripheral
   PRR &= ~_BV(PRSPI);

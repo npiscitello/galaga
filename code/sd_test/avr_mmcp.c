@@ -58,10 +58,11 @@ void dly_100us( void ) {
 }
 
 void init_spi( void ) {
-  transmit_string_flash(init, LEN_INIT);
+  //transmit_string_flash(init, LEN_INIT);
 
-  // outputs
-  DDRB |= _BV(DDB7) | _BV(DDB3) | _BV(DDB5);
+  // outputs - B2 must be an output so the chip doesn't get
+  // knocked out of Master mode from the floating input.
+  DDRB |= _BV(DDB7) | _BV(DDB3) | _BV(DDB5) | _BV(DDB2);
 
   // turn on and configure SPI peripheral
   PRR &= ~_BV(PRSPI);
@@ -71,22 +72,22 @@ void init_spi( void ) {
   // gotta go fAST
   FCLK_FAST();
 
-  transmit_string_flash(init, LEN_INIT);
+  //transmit_string_flash(init, LEN_INIT);
   return;
 }
 
 void xmit_spi( BYTE d ) {
-  transmit_string_flash(xmit, LEN_XMIT);
+  //transmit_string_flash(xmit, LEN_XMIT);
   SPDR = d;
   loop_until_bit_is_set(SPSR, SPIF);
-  transmit_string_flash(xmit, LEN_XMIT);
+  //transmit_string_flash(xmit, LEN_XMIT);
   return;
 }
 
 BYTE rcv_spi( void ) {
-  transmit_string_flash(rcv, LEN_RCV);
+  //transmit_string_flash(rcv, LEN_RCV);
   xmit_spi(0xFF);
-  transmit_string_flash(rcv, LEN_RCV);
+  //transmit_string_flash(rcv, LEN_RCV);
   return SPDR;
 }
 
@@ -180,7 +181,7 @@ DSTATUS disk_initialize (void)
 	init_spi();		/* Initialize ports to control MMC */
 	CS_HIGH();
 	for (n = 10; n; n--) {
-    transmit_string_flash(loop, LEN_LOOP);
+    //transmit_string_flash(loop, LEN_LOOP);
     rcv_spi();	/* 80 dummy clocks with CS=H */
   }
 
