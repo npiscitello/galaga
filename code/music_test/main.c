@@ -9,7 +9,7 @@
 #define PWM_RESOLUTION 0x00FF
 
 // used to test the self-power-off function
-#define PWR_CONTROL 0
+#define PWR_CONTROL 1
 
 // USART output
 #define USART 1
@@ -17,7 +17,10 @@
 // how many bytes are in each of the double buffers
 #define BUFFER_SIZE 512
 
-#define TRY_SD_OP(A) if( A != FR_OK ) { error_exit(); }
+// if an SD card op fails all we can do is try again
+// <TODO> add logic in the final app to power off after 
+// a certain number of failed ops
+#define TRY_SD_OP(A) while( A != FR_OK ) {}
 
 volatile uint8_t flags = 0x00;
 #define MSK_FLAG_SD_READING       0x01
@@ -53,6 +56,8 @@ const char PROGMEM open[] = "file open\r\n";
 const char PROGMEM read[] = "data read\r\n";
 #define LEN_ERROR 11
 const char PROGMEM error[] = "SD op err\r\n";
+#define LEN_EOF 5
+const char PROGMEM eof[] = "eof\r\n";
 
 #if USART == 1
 /* Transmit a string from flash over UART
@@ -93,17 +98,6 @@ void init_usart0(void) {
 
 
 
-void error_exit(void) {
-#if USART == 1
-  transmit_string_flash(error, LEN_ERROR);
-#else
-  set_mask(&PORTD, _BV(PORTD0));
-#endif
-  err++;
-}
-
-
-
 void setup_timer1(void) {
   // disable interrupts globally for setup
   cli();
@@ -139,7 +133,8 @@ void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
   set_mask(&flags, MSK_FLAG_SD_READING);
   TRY_SD_OP( pf_read(read_buf, num_bytes, &bytes_read) );
   clr_mask(&flags, MSK_FLAG_SD_READING);
-  if( bytes_read < BUFFER_SIZE ) {
+  if( bytes_read < num_bytes ) {
+    transmit_string_flash(eof, LEN_EOF);
     set_mask(&flags, MSK_FLAG_END_OF_FILE);
   }
   return;
@@ -188,45 +183,38 @@ int main(void) {
   buf_read = malloc(BUFFER_SIZE);
   buf_load = malloc(BUFFER_SIZE);
   if( (buf_read == 0) || (buf_load == 0) ) {
-    error_exit();
+    // I don't know how to recover from a malloc error
+    // shut off and try again next time!
+    clr_mask(&PORTB, _BV(PORTB6));
   }
-  set_mask(&PORTD, _BV(PORTD1));
 
   // pre-load buffer
   FATFS fs;
-  do {
-    err = 0;
-    transmit_string_flash(sdinit, LEN_SDINIT);
-    TRY_SD_OP( pf_mount( &fs ) );
-    transmit_string_flash(mount, LEN_MOUNT);
-    set_mask(&PORTD, _BV(PORTD2));
-    TRY_SD_OP( pf_open( "SITB.PCM" ) );
-    transmit_string_flash(open, LEN_OPEN);
-    set_mask(&PORTD, _BV(PORTD3));
-    read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
-    transmit_string_flash(read, LEN_READ);
-    set_mask(&PORTD, _BV(PORTD4));
-  } while(err != 0);
+  transmit_string_flash(sdinit, LEN_SDINIT);
+  TRY_SD_OP( pf_mount( &fs ) );
+  transmit_string_flash(mount, LEN_MOUNT);
+  TRY_SD_OP( pf_open( "SITB.PCM" ) );
+  transmit_string_flash(open, LEN_OPEN);
+  read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
+  transmit_string_flash(read, LEN_READ);
 
-  transmit_string_flash(pwm, LEN_PWM);
   // kick off audio
+  transmit_string_flash(pwm, LEN_PWM);
   swap_buffers(&buf_read, &buf_load);
   start_PWM();
 
   while(1) {
-    transmit_string_flash(load, LEN_LOAD);
+    //transmit_string_flash(load, LEN_LOAD);
     // load new data every time the buffers swap
     if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
       read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
       clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
-      set_mask(&PORTD, _BV(PORTD5));
     }
     
     // if we hit the end of the file, reset the read pointer
     if( flags & MSK_FLAG_END_OF_FILE ) {
       TRY_SD_OP( pf_lseek(0) );
       clr_mask(&flags, MSK_FLAG_END_OF_FILE);
-      set_mask(&PORTD, _BV(PORTD6));
 
 #if PWR_CONTROL
       // put PB6 low to turn off the power
