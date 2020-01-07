@@ -82,7 +82,8 @@ OBJDIR = .
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c	\
 			./avr_mmcp.c 	\
-			../petit_fatfs/source/pff.c
+			../petit_fatfs/source/pff.c \
+			usart.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

@@ -9,6 +9,16 @@
 /*-------------------------------------------------------------------------*/
 
 #include <avr/io.h>			/* Device specific include files */
+#include <avr/pgmspace.h>
+#include "usart.h"
+// enable/disable serial debugging in usart.h
+
+#define LEN_INIT 7
+const char PROGMEM init[] = "init\r\n";
+#define LEN_XMIT 6
+const char PROGMEM xmit[] = "xmit\r\n";
+#define LEN_RCV 5
+const char PROGMEM rcv[] = "rcv\r\n";
 
 #define CS_LOW()	PORTB &= ~_BV(PORTB7)	/* Set CS low */
 #define	CS_HIGH()	PORTB |=  _BV(PORTB7)	/* Set CS high */
@@ -46,29 +56,39 @@ void dly_100us( void ) {
 }
 
 void init_spi( void ) {
+  transmit_string_flash(init, LEN_INIT);
+
   // outputs
   DDRB |= _BV(DDB7) | _BV(DDB3) | _BV(DDB5);
 
   // turn on and configure SPI peripheral
   PRR &= ~_BV(PRSPI);
-  SPCR = _BV(SPE) | _BV(MSTR) | _BV(SPR1) | _BV(SPR0);
+  SPCR = _BV(MSTR) | _BV(SPR1) | _BV(SPR0);
   SPSR = _BV(SPI2X);
+  SPCR = _BV(SPE);
 
   // gotta go fAST
   FCLK_FAST();
 
+  transmit_string_flash(init, LEN_INIT);
   return;
 }
 
 void xmit_spi( BYTE d ) {
+  transmit_string_flash(xmit, LEN_XMIT);
   SPDR = d;
+  transmit_string_flash(xmit, LEN_XMIT);
   loop_until_bit_is_set(SPSR, SPIF);
-  SPSR |= _BV(SPIF);
+  // must "access" the SPDR after reading SPSR to clear SPIF
+  //SPDR & 0xFF;
+  transmit_string_flash(xmit, LEN_XMIT);
   return;
 }
 
 BYTE rcv_spi( void ) {
+  transmit_string_flash(rcv, LEN_RCV);
   xmit_spi(0xFF);
+  transmit_string_flash(rcv, LEN_RCV);
   return SPDR;
 }
 

@@ -1,5 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include "usart.h"
 #include "pff.h"
 #include "diskio.h"
 
@@ -10,6 +12,47 @@
 #define ASCII_5 0x35
 #define ASCII_6 0x36
 #define ASCII_7 0x37
+
+// run a connectivity test instead of a content test
+#define CONN_TEST 1
+// enable/disable serial debugging in usart.h
+
+#define LEN_STARTUP 13
+const char PROGMEM startup[] = "\r\n\r\nstartup\r\n";
+#define LEN_CONN_TEST_STR 11
+const char PROGMEM conn_test_str[] = "conn test\r\n";
+#define LEN_FRS_UNKNOWN 17
+const char PROGMEM frs_unknown[] = "unknown FRESULT\r\n";
+#define LEN_FRS_OK 7
+const char PROGMEM frs_ok[] = "FR_OK\r\n";
+#define LEN_FRS_NOT_READY 14
+const char PROGMEM frs_not_ready[] = "FR_NOT_READY\r\n";
+#define LEN_FRS_DISK_ERR 13
+const char PROGMEM frs_disk_err[] = "FR_DISK_ERR\r\n";
+#define LEN_FRS_NO_FILESYSTEM 18
+const char PROGMEM frs_no_filesystem[] = "FR_NO_FILESYSTEM\r\n";
+
+void print_fresult(FRESULT res) {
+  switch(res) {
+    case FR_OK:
+      transmit_string_flash(frs_ok, LEN_FRS_OK);
+      break;
+    case FR_NOT_READY:
+      transmit_string_flash(frs_not_ready, LEN_FRS_NOT_READY);
+      break;
+    case FR_DISK_ERR:
+      transmit_string_flash(frs_disk_err, LEN_FRS_DISK_ERR);
+      break;
+    case FR_NO_FILESYSTEM:
+      transmit_string_flash(frs_no_filesystem, LEN_FRS_NO_FILESYSTEM);
+      break;
+    default:
+      transmit_string_flash(frs_unknown, LEN_FRS_UNKNOWN);
+      break;
+  }
+}
+
+
 
 void set_mask( volatile uint8_t* reg, uint8_t mask ) {
   *reg |= mask;
@@ -72,7 +115,20 @@ FRESULT sd_ops(uint8_t* file_data, uint8_t file_data_len) {
 }
 
 int main(void) {
+  init_usart0();
+  transmit_string_flash(startup, LEN_STARTUP);
+#if CONN_TEST == 1
+  transmit_string_flash(conn_test_str, LEN_CONN_TEST_STR);
+  FATFS fs;
+  FRESULT res;
 
+  disk_initialize();
+  transmit_string_flash(frs_unknown, LEN_FRS_UNKNOWN);
+  do {
+  res = pf_mount( &fs );
+  } while (res != FR_OK);
+  print_fresult(res);
+#else
   // PortD - LED output
   DDRD = 0xFF;
 
@@ -130,4 +186,5 @@ int main(void) {
       }
     }
   }
+#endif
 }
