@@ -9,7 +9,7 @@
 #define PWM_RESOLUTION 0x00FF
 
 // used to test the self-power-off function
-#define PWR_CONTROL 1
+#define PWR_CONTROL 0
 
 // USART output
 #define USART 1
@@ -51,6 +51,8 @@ const char PROGMEM mount[] = "sdc mount\r\n";
 const char PROGMEM open[] = "file open\r\n";
 #define LEN_READ 11
 const char PROGMEM read[] = "data read\r\n";
+#define LEN_ERROR 11
+const char PROGMEM error[] = "SD op err\r\n";
 
 #if USART == 1
 /* Transmit a string from flash over UART
@@ -88,6 +90,17 @@ void init_usart0(void) {
   return;
 }
 #endif
+
+
+
+void error_exit(void) {
+#if USART == 1
+  transmit_string_flash(error, LEN_ERROR);
+#else
+  set_mask(&PORTD, _BV(PORTD0));
+#endif
+  err++;
+}
 
 
 
@@ -165,8 +178,9 @@ int main(void) {
   DDRD = 0xFF;
 
 #if PWR_CONTROL
+  // set PB6 to output and set high to keep SSR latched
   set_mask(&DDRB, _BV(DDB6));
-  clr_mask(&PORTB, _BV(PORTB6));
+  set_mask(&PORTB, _BV(PORTB6));
 #endif
 
   // set up buffers
@@ -215,8 +229,8 @@ int main(void) {
       set_mask(&PORTD, _BV(PORTD6));
 
 #if PWR_CONTROL
-      // put PB6 high to turn off the power
-      set_mask(&PORTB, _BV(PORTB6));
+      // put PB6 low to turn off the power
+      clr_mask(&PORTB, _BV(PORTB6));
 #endif
     }
   }

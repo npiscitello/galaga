@@ -17,23 +17,23 @@ $EndDescr
 $Comp
 L Amplifier_Audio:LM386 U3
 U 1 1 5BB681DC
-P 8700 1150
-F 0 "U3" H 8800 1400 50  0000 L CNN
-F 1 "LM386" H 8750 1300 50  0000 L CNN
-F 2 "Package_DIP:DIP-8_W7.62mm" H 8800 1250 50  0001 C CNN
-F 3 "http://www.ti.com/lit/ds/symlink/lm386.pdf" H 8900 1350 50  0001 C CNN
-	1    8700 1150
+P 7500 1200
+F 0 "U3" H 7600 1450 50  0000 L CNN
+F 1 "LM386" H 7550 1350 50  0000 L CNN
+F 2 "Package_DIP:DIP-8_W7.62mm" H 7600 1300 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/lm386.pdf" H 7700 1400 50  0001 C CNN
+	1    7500 1200
 	1    0    0    -1  
 $EndComp
 $Comp
 L Regulator_Linear:LD1117S33TR_SOT223 U1
 U 1 1 5BB68376
-P 2050 1250
-F 0 "U1" H 2050 1492 50  0000 C CNN
-F 1 "LD1117S33TR_SOT223" H 2050 1401 50  0000 C CNN
-F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 2050 1450 50  0001 C CNN
-F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf" H 2150 1000 50  0001 C CNN
-	1    2050 1250
+P 1900 1200
+F 0 "U1" H 1900 1442 50  0000 C CNN
+F 1 "LD1117S33TR_SOT223" H 1900 1351 50  0000 C CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 1900 1400 50  0001 C CNN
+F 3 "http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/CD00000544.pdf" H 2000 950 50  0001 C CNN
+	1    1900 1200
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -74,51 +74,40 @@ $EndComp
 $Comp
 L power:GND #PWR02
 U 1 1 5BB68C10
-P 1200 2450
-F 0 "#PWR02" H 1200 2200 50  0001 C CNN
-F 1 "GND" H 1205 2277 50  0000 C CNN
-F 2 "" H 1200 2450 50  0001 C CNN
-F 3 "" H 1200 2450 50  0001 C CNN
-	1    1200 2450
+P 1200 2750
+F 0 "#PWR02" H 1200 2500 50  0001 C CNN
+F 1 "GND" H 1205 2577 50  0000 C CNN
+F 2 "" H 1200 2750 50  0001 C CNN
+F 3 "" H 1200 2750 50  0001 C CNN
+	1    1200 2750
 	1    0    0    -1  
 $EndComp
 Text GLabel 1400 750  2    50   Input ~ 0
 +9V
 Wire Wire Line
 	1200 800  1200 850 
-Text GLabel 2100 1700 2    50   Input ~ 0
+Text GLabel 1950 1550 2    50   Input ~ 0
 DGND
-Text GLabel 2400 1250 2    50   Input ~ 0
+Text GLabel 2250 1200 2    50   Input ~ 0
 +3V3
 Wire Wire Line
-	8600 1450 8600 1500
-Text GLabel 8400 1600 2    50   Input ~ 0
+	7400 1500 7400 1550
+Text GLabel 7200 1650 2    50   Input ~ 0
 DGND
-Text GLabel 8550 800  0    50   Input ~ 0
+Text GLabel 7350 850  0    50   Input ~ 0
 +9V
 Wire Wire Line
-	8550 800  8600 800 
+	7350 850  7400 850 
 Wire Wire Line
-	8600 800  8600 850 
+	7400 850  7400 900 
 Wire Wire Line
-	8400 1250 8350 1250
-$Comp
-L Device:CP C5
-U 1 1 5BB76434
-P 9200 1150
-F 0 "C5" V 9455 1150 50  0000 C CNN
-F 1 "250uF" V 9364 1150 50  0000 C CNN
-F 2 "Capacitor_THT:CP_Axial_L20.0mm_D10.0mm_P26.00mm_Horizontal" H 9238 1000 50  0001 C CNN
-F 3 "~" H 9200 1150 50  0001 C CNN
-	1    9200 1150
-	0    -1   -1   0   
-$EndComp
+	7200 1300 7150 1300
 Wire Wire Line
-	9350 1150 9400 1150
+	9000 1200 9050 1200
 Wire Wire Line
-	9400 1250 9350 1250
+	9050 1300 9000 1300
 Wire Wire Line
-	9350 1250 9350 1500
+	9000 1300 9000 1550
 Text GLabel 5400 1550 0    50   Input ~ 0
 +3V3
 Wire Wire Line
@@ -158,12 +147,12 @@ Wire Wire Line
 $Comp
 L Connector:Screw_Terminal_01x02 J2
 U 1 1 5BBBC1CA
-P 9600 1150
-F 0 "J2" H 9680 1142 50  0000 L CNN
-F 1 "speaker_out" H 9680 1051 50  0000 L CNN
-F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 9600 1150 50  0001 C CNN
-F 3 "~" H 9600 1150 50  0001 C CNN
-	1    9600 1150
+P 9250 1200
+F 0 "J2" H 9330 1192 50  0000 L CNN
+F 1 "speaker_out" H 9330 1101 50  0000 L CNN
+F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 9250 1200 50  0001 C CNN
+F 3 "~" H 9250 1200 50  0001 C CNN
+	1    9250 1200
 	1    0    0    -1  
 $EndComp
 Text GLabel 6400 3500 0    50   Input ~ 0
@@ -182,17 +171,6 @@ Text Notes 6650 3050 0    50   ~ 0
 booster0 (bs0)
 Text Notes 6650 3350 0    50   ~ 0
 booster1 (bs1)
-$Comp
-L Device:CP C1
-U 1 1 5BBE6099
-P 8100 1250
-F 0 "C1" H 8200 1150 50  0000 C CNN
-F 1 "10uF" H 8250 1350 50  0000 C CNN
-F 2 "Capacitor_THT:CP_Axial_L10.0mm_D6.0mm_P15.00mm_Horizontal" H 8138 1100 50  0001 C CNN
-F 3 "~" H 8100 1250 50  0001 C CNN
-	1    8100 1250
-	1    0    0    -1  
-$EndComp
 $Comp
 L Connector:Screw_Terminal_01x03 J1
 U 1 1 5BC32DBF
@@ -276,43 +254,24 @@ F 3 "~" H 6600 3500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	8400 1050 8100 1050
-Wire Wire Line
-	8100 1050 8100 1100
-Wire Wire Line
-	8100 1400 8100 2000
-Wire Wire Line
-	9000 1150 9050 1150
-Wire Wire Line
-	8600 1500 8750 1500
+	7200 1100 6200 1100
 $Comp
 L Isolator:LTV-817M U5
 U 1 1 5D708174
-P 2450 2150
-F 0 "U5" H 2450 2475 50  0001 C CNN
-F 1 "LTV-817M" H 2450 2384 50  0001 C CNN
-F 2 "Package_DIP:DIP-4_W10.16mm" H 2450 1850 50  0001 C CNN
-F 3 "http://www.us.liteon.com/downloads/LTV-817-827-847.PDF" H 2050 2450 50  0001 C CNN
-	1    2450 2150
-	-1   0    0    -1  
-$EndComp
-$Comp
-L Transistor_FET:2N7000 Q1
-U 1 1 5D708462
-P 1450 1950
-F 0 "Q1" H 1655 1996 50  0001 L CNN
-F 1 "2N7000" H 1655 1905 50  0001 L CNN
-F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 1650 1875 50  0001 L CIN
-F 3 "https://www.fairchildsemi.com/datasheets/2N/2N7000.pdf" H 1450 1950 50  0001 L CNN
-	1    1450 1950
-	-1   0    0    -1  
+P 2750 2300
+F 0 "U5" H 2750 2625 50  0001 C CNN
+F 1 "LTV-817M" H 2750 2534 50  0001 C CNN
+F 2 "Package_DIP:DIP-4_W10.16mm" H 2750 2000 50  0001 C CNN
+F 3 "http://www.us.liteon.com/downloads/LTV-817-827-847.PDF" H 2350 2600 50  0001 C CNN
+	1    2750 2300
+	0    1    -1   0   
 $EndComp
 $Comp
 L Device:R R2
 U 1 1 5D7084DD
 P 1350 1500
 F 0 "R2" H 1420 1546 50  0000 L CNN
-F 1 "10M" H 1420 1455 50  0000 L CNN
+F 1 "10k" H 1420 1455 50  0000 L CNN
 F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 1280 1500 50  0001 C CNN
 F 3 "~" H 1350 1500 50  0001 C CNN
 	1    1350 1500
@@ -321,138 +280,72 @@ $EndComp
 $Comp
 L Device:R R3
 U 1 1 5D70854B
-P 2750 1650
-F 0 "R3" H 2820 1696 50  0000 L CNN
-F 1 "20K" H 2820 1605 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 2680 1650 50  0001 C CNN
-F 3 "~" H 2750 1650 50  0001 C CNN
-	1    2750 1650
-	1    0    0    -1  
+P 1700 2250
+F 0 "R3" H 1770 2296 50  0000 L CNN
+F 1 "10K" H 1770 2205 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 1630 2250 50  0001 C CNN
+F 3 "~" H 1700 2250 50  0001 C CNN
+	1    1700 2250
+	-1   0    0    1   
 $EndComp
 $Comp
 L Switch:SW_Push SW1
 U 1 1 5D7085A6
-P 2750 1100
-F 0 "SW1" V 2704 1248 50  0001 L CNN
-F 1 "SW_Push" V 2795 1248 50  0001 L CNN
-F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 2750 1300 50  0001 C CNN
-F 3 "" H 2750 1300 50  0001 C CNN
-	1    2750 1100
+P 2650 1100
+F 0 "SW1" V 2604 1248 50  0001 L CNN
+F 1 "SW_Push" V 2695 1248 50  0001 L CNN
+F 2 "TerminalBlock_TE-Connectivity:TerminalBlock_TE_282834-2_1x02_P2.54mm_Horizontal" H 2650 1300 50  0001 C CNN
+F 3 "" H 2650 1300 50  0001 C CNN
+	1    2650 1100
 	0    1    1    0   
 $EndComp
 Wire Wire Line
 	6050 2400 7650 2400
-Connection ~ 8750 1500
 Wire Wire Line
-	8750 1500 9350 1500
+	7200 1650 7150 1650
 Wire Wire Line
-	8400 1600 8350 1600
-Wire Wire Line
-	8350 1250 8350 1600
+	7150 1300 7150 1550
 Text GLabel 6400 3400 0    50   Input ~ 0
 DGND
 Wire Wire Line
 	1100 950  1200 950 
 Wire Wire Line
-	1200 950  1200 2250
-Wire Wire Line
-	2400 1250 2350 1250
+	1200 950  1200 2500
 Connection ~ 1200 850 
 Wire Wire Line
-	2050 1700 2050 1550
-Wire Wire Line
-	2100 1700 2050 1700
-Text GLabel 1250 2400 2    50   Input ~ 0
-BGND
-Wire Wire Line
-	1250 2400 1200 2400
-Connection ~ 1200 2400
-Wire Wire Line
-	1200 2400 1200 2450
-Text GLabel 8800 1600 2    50   Input ~ 0
-BGND
-Wire Wire Line
-	8800 1600 8750 1600
-Wire Wire Line
-	8750 1500 8750 1600
-Wire Wire Line
-	1350 2150 1350 2250
-Connection ~ 1200 2250
-Wire Wire Line
-	1200 2250 1200 2400
+	1350 2150 1350 2500
+Connection ~ 1200 2500
 Wire Wire Line
 	1400 750  1350 750 
 Wire Wire Line
 	1350 750  1350 850 
 Connection ~ 1350 850 
 Wire Wire Line
-	1750 1250 1600 1250
-Wire Wire Line
-	1600 1250 1600 850 
-Wire Wire Line
-	1600 850  1350 850 
-Wire Wire Line
-	2750 900  2750 850 
-Wire Wire Line
-	2750 850  1600 850 
-Connection ~ 1600 850 
+	2650 900  2650 850 
 Wire Wire Line
 	1200 850  1350 850 
-Wire Wire Line
-	2150 2050 2100 2050
-Wire Wire Line
-	2100 2050 2100 1950
-Wire Wire Line
-	2150 2250 1350 2250
-Connection ~ 1350 2250
-Text GLabel 2800 2250 2    50   Input ~ 0
+Connection ~ 1350 2500
+Text GLabel 2650 2650 3    50   Input ~ 0
 DGND
-Wire Wire Line
-	2800 2250 2750 2250
-Text GLabel 3150 2050 2    50   Input ~ 0
+Text GLabel 2850 3000 3    50   Input ~ 0
 PWR_OFF
-Wire Wire Line
-	2750 2050 2800 2050
-Connection ~ 2100 1950
-Wire Wire Line
-	2100 1950 1650 1950
-Wire Wire Line
-	2100 1950 2750 1950
-Wire Wire Line
-	1250 2250 1350 2250
-Wire Wire Line
-	1200 2250 1350 2250
 $Comp
 L Device:R R4
 U 1 1 5D77529A
-P 2950 2050
-F 0 "R4" V 2743 2050 50  0000 C CNN
-F 1 "180R" V 2834 2050 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 2880 2050 50  0001 C CNN
-F 3 "~" H 2950 2050 50  0001 C CNN
-	1    2950 2050
-	0    1    1    0   
+P 2850 2800
+F 0 "R4" V 2643 2800 50  0000 C CNN
+F 1 "180R" V 2734 2800 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 2780 2800 50  0001 C CNN
+F 3 "~" H 2850 2800 50  0001 C CNN
+	1    2850 2800
+	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	3100 2050 3150 2050
 Text GLabel 6100 2500 2    50   Input ~ 0
 PWR_OFF
 Wire Wire Line
 	6100 2500 6050 2500
-Connection ~ 2050 1700
 Wire Wire Line
-	1350 1700 1350 1650
-Wire Wire Line
-	1350 1750 1350 1700
-Connection ~ 1350 1700
-Wire Wire Line
-	1350 1700 2050 1700
-Wire Wire Line
-	2750 1800 2750 1950
-Wire Wire Line
-	1350 850  1350 1350
-Wire Wire Line
-	2750 1300 2750 1500
+	1350 850  1350 1200
 $Comp
 L Connector_Generic:Conn_02x03_Odd_Even J6
 U 1 1 5D757B8F
@@ -500,7 +393,161 @@ Wire Wire Line
 	10150 2400 9700 2400
 Connection ~ 7750 2200
 Wire Wire Line
-	6050 2000 8100 2000
+	6050 2000 6200 2000
 Wire Wire Line
 	6100 2600 6050 2600
+$Comp
+L Device:C C3
+U 1 1 5E13D4E4
+P 8100 1050
+F 0 "C3" V 7848 1050 50  0000 C CNN
+F 1 "0.05uF" V 7939 1050 50  0000 C CNN
+F 2 "Capacitor_THT:C_Disc_D12.0mm_W4.4mm_P7.75mm" H 8138 900 50  0001 C CNN
+F 3 "~" H 8100 1050 50  0001 C CNN
+	1    8100 1050
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R1
+U 1 1 5E13D5AB
+P 8450 1050
+F 0 "R1" V 8243 1050 50  0000 C CNN
+F 1 "10R" V 8334 1050 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 8380 1050 50  0001 C CNN
+F 3 "~" H 8450 1050 50  0001 C CNN
+	1    8450 1050
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 1050 8300 1050
+Wire Wire Line
+	7950 1050 7900 1050
+Wire Wire Line
+	7900 1050 7900 1200
+Connection ~ 7900 1200
+Wire Wire Line
+	7900 1200 8700 1200
+Wire Wire Line
+	7800 1200 7900 1200
+Wire Wire Line
+	8600 1050 8650 1050
+Wire Wire Line
+	8650 1050 8650 1550
+Connection ~ 8650 1550
+Wire Wire Line
+	8650 1550 9000 1550
+$Comp
+L Device:CP C2
+U 1 1 5E1771D5
+P 6750 1350
+F 0 "C2" V 7005 1350 50  0000 C CNN
+F 1 "330uF" V 6914 1350 50  0000 C CNN
+F 2 "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm" H 6788 1200 50  0001 C CNN
+F 3 "~" H 6750 1350 50  0001 C CNN
+	1    6750 1350
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	6750 1200 6750 750 
+Wire Wire Line
+	6750 750  7400 750 
+Wire Wire Line
+	7400 750  7400 850 
+Connection ~ 7400 850 
+$Comp
+L Device:CP C4
+U 1 1 5E17DFAC
+P 8850 1200
+F 0 "C4" V 9105 1200 50  0000 C CNN
+F 1 "330uF" V 9014 1200 50  0000 C CNN
+F 2 "Capacitor_THT:CP_Radial_D10.0mm_P5.00mm" H 8888 1050 50  0001 C CNN
+F 3 "~" H 8850 1200 50  0001 C CNN
+	1    8850 1200
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6200 1100 6200 2000
+$Comp
+L Transistor_FET:IRF540N Q?
+U 1 1 5E19A72B
+P 1450 1950
+F 0 "Q?" H 1656 1996 50  0000 L CNN
+F 1 "IRF540N" H 1656 1905 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 1700 1875 50  0001 L CIN
+F 3 "http://www.irf.com/product-info/datasheets/data/irf540n.pdf" H 1450 1950 50  0001 L CNN
+	1    1450 1950
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	2250 1200 2200 1200
+Wire Wire Line
+	1350 1650 1350 1700
+Wire Wire Line
+	1950 1550 1900 1550
+Wire Wire Line
+	1900 1550 1900 1500
+Wire Wire Line
+	2850 2950 2850 3000
+Wire Wire Line
+	2850 2600 2850 2650
+Wire Wire Line
+	2650 2650 2650 2600
+Wire Wire Line
+	1250 2500 1350 2500
+Wire Wire Line
+	1200 2500 1350 2500
+Wire Wire Line
+	1700 2100 1700 1950
+Wire Wire Line
+	1700 1950 1650 1950
+Wire Wire Line
+	1700 2400 1700 2500
+Wire Wire Line
+	1700 2500 1350 2500
+Wire Wire Line
+	1900 1550 1900 1700
+Wire Wire Line
+	1900 1700 1350 1700
+Connection ~ 1900 1550
+Connection ~ 1350 1700
+Wire Wire Line
+	1350 1700 1350 1750
+Wire Wire Line
+	1600 1200 1350 1200
+Connection ~ 1350 1200
+Wire Wire Line
+	1350 1200 1350 1350
+Connection ~ 1700 1950
+Wire Wire Line
+	1350 850  2650 850 
+Text Notes 2650 3600 0    50   ~ 0
+HIGH = ON\nLOW = OFF
+Connection ~ 2650 850 
+Wire Wire Line
+	2650 1300 2650 1950
+Wire Wire Line
+	2650 1950 1700 1950
+Wire Wire Line
+	2650 2000 2650 1950
+Connection ~ 2650 1950
+Wire Wire Line
+	2850 2000 2850 850 
+Wire Wire Line
+	2650 850  2850 850 
+Text Notes 6550 2600 0    50   ~ 0
+HIGH = ON\nLOW = OFF
+Wire Wire Line
+	7400 1550 7150 1550
+Connection ~ 7150 1550
+Wire Wire Line
+	7150 1550 7150 1650
+Wire Wire Line
+	7150 1550 6750 1550
+Wire Wire Line
+	6750 1550 6750 1500
+Connection ~ 7400 1550
+Wire Wire Line
+	7400 1550 8650 1550
+Wire Wire Line
+	1200 2500 1200 2750
 $EndSCHEMATC

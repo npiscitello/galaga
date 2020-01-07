@@ -6,19 +6,31 @@
 // higher resolution means a lower frequency
 #define PWM_RESOLUTION 0x00FF
 
+// test poweroff
+#define POWEROFF_EN
+
 volatile uint32_t sample_index = 0;
 ISR(TIMER1_OVF_vect) {
   // YCM doesn't like this - makes sense that AVR assembler magic won't work locally.
   OCR1AL = pgm_read_byte_near(audio_samples + sample_index);
   sample_index++;
   if( sample_index >= AUDIO_NUM_SAMPLES ) {
+#ifdef POWEROFF_EN
+    PORTB &= ~_BV(PORTB6);
+#else
     sample_index = 0;
+#endif
   }
 }
 
 
 
 int main(void) {
+
+#ifdef POWEROFF_EN
+  DDRB |= _BV(DDB6);
+  PORTB |= _BV(PORTB6);
+#endif
 
   // disable interrupts globally for setup
   cli();

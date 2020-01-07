@@ -24,10 +24,6 @@ void start_PWM(void) {
   set_mask(&TCCR1B, _BV(CS10));
 }
 
-void error_exit(void) {
-  set_mask(&PORTD, _BV(PORTD0));
-  err++;
-}
 
 void swap_buffers( volatile uint8_t** label_a, volatile uint8_t** label_b ) {
   volatile uint8_t* placeholder = *label_a;
