@@ -468,10 +468,10 @@ $EndComp
 Wire Wire Line
 	6200 1100 6200 2000
 $Comp
-L Transistor_FET:IRF540N Q?
+L Transistor_FET:IRF540N Q1
 U 1 1 5E19A72B
 P 1450 1950
-F 0 "Q?" H 1656 1996 50  0000 L CNN
+F 0 "Q1" H 1656 1996 50  0000 L CNN
 F 1 "IRF540N" H 1656 1905 50  0000 L CNN
 F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 1700 1875 50  0001 L CIN
 F 3 "http://www.irf.com/product-info/datasheets/data/irf540n.pdf" H 1450 1950 50  0001 L CNN
