@@ -35,11 +35,6 @@ PGM_P const filenames[] PROGMEM = {
   nameent
 };
 
-/* see https://www.nongnu.org/avr-libc/user-manual/pgmspace.html for info on how
-to read the strings - it'll look like
-strcpy_P(ram_buf, (PGM_P)pgm_read_word(&(filenames[i])));
-*/
-
 // generate a (sorta not really) "random" number from ADC readings
 uint8_t get_random_int( uint8_t max_val ) {
   // sample the lower 2 bits of the ADC 4 times and mod by max_val
@@ -55,7 +50,7 @@ uint8_t get_random_int( uint8_t max_val ) {
 
   for( int i = 0; i < 8; i += 2 ) {
     ADCSRA |= _BV(ADSC);
-    while( (ADCSRA & _BV(ADSC)) == 1 ) {}
+    while( ADCSRA & _BV(ADSC) ) {}
     // we could just use ADCL, but we need to read ADCH to clear it anyways and
     // this makes sure the compiler takes care of it.
     rand |= (ADCW & 0x0003) << i;
@@ -63,8 +58,13 @@ uint8_t get_random_int( uint8_t max_val ) {
 
   PRR |= _BV(PRADC);
 
-  return rand;
+  return rand % max_val;
 }
+
+/* see https://www.nongnu.org/avr-libc/user-manual/pgmspace.html for info on how
+to read the strings - it'll look like
+strcpy_P(ram_buf, (PGM_P)pgm_read_word(&(filenames[i])));
+*/
 
 void get_filename( char* filename_buffer ) {
   // C programmers don't measure dicks, they measure oneliners
@@ -74,5 +74,6 @@ void get_filename( char* filename_buffer ) {
         &(filenames[get_random_int(NUM_FILENAMES)])
         )
       );
+  //strcpy_P(filename_buffer, (PGM_P)pgm_read_word(&(filenames[3])));
   return;
 }

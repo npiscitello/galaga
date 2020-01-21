@@ -80,8 +80,10 @@ OBJDIR = .
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c \
-			sound_files.c
+SRC = $(TARGET).c	\
+			./avr_mmcp.c	\
+			../petit_fatfs/source/pff.c \
+			sound_files.c \
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
@@ -115,7 +117,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = 
+EXTRAINCDIRS = ../petit_fatfs/source
 
 
 # Compiler flag to set the C Standard level.
@@ -304,6 +306,9 @@ AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
 AVRDUDE_FLAGS += $(AVRDUDE_VERBOSE)
 AVRDUDE_FLAGS += $(AVRDUDE_ERASE_COUNTER)
 
+# explicity set the baudrate
+# AVRDUDE_FLAGS += -b 921600
+
 
 
 #---------------- Debugging Options ----------------
@@ -429,7 +434,8 @@ end:
 
 # Display size of file.
 HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
-ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
+#ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
+ELFSIZE = $(SIZE) $(TARGET).elf
 
 sizebefore:
 	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); \
