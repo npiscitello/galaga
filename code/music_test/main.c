@@ -6,6 +6,8 @@
 #include "diskio.h"
 #include "utils.h"
 
+#define FILENAME "INTRO.PCM"
+
 #define PWM_RESOLUTION 0x00FF
 
 // used to test the self-power-off function
@@ -193,7 +195,7 @@ int main(void) {
   transmit_string_flash(sdinit, LEN_SDINIT);
   TRY_SD_OP( pf_mount( &fs ) );
   transmit_string_flash(mount, LEN_MOUNT);
-  TRY_SD_OP( pf_open( "SITB.PCM" ) );
+  TRY_SD_OP( pf_open(FILENAME) );
   transmit_string_flash(open, LEN_OPEN);
   read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
   transmit_string_flash(read, LEN_READ);
