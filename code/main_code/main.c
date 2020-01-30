@@ -39,7 +39,7 @@ void setup_timer1(void) {
   // disable interrupts globally for setup
   cli();
   // set OC1A (PB1) to output
-  DDRB = 0x00 | _BV(DDB1);
+  set_mask(&DDRB, _BV(DDB1));
   // turn on timer 1
   PRR = 0xFF & !_BV(PRTIM1);
 
