@@ -5,9 +5,6 @@
 #include "utils.h"
 #include "sound_files.h"
 
-// debug - manually specify a filename
-#define FILENAME "INTRO.PCM"
-
 // how many bits of resolution used by the DAC
 #define PWM_RESOLUTION 0x00FF
 
@@ -18,6 +15,9 @@
 // <TODO> add logic in the final app to power off after 
 // a certain number of failed ops
 #define TRY_SD_OP(A) while( A != FR_OK ) {}
+// debug - power off if an SD op fails
+//#define TRY_SD_OP(A) while( A != FR_OK ) {clr_mask(&PORTB, _BV(PORTB6));}
+
 
 volatile uint8_t flags = 0x00;
 #define MSK_FLAG_SD_READING       0x01
@@ -79,8 +79,8 @@ void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
 
 
 
-// pump out a sample. If the SD card is still filling the other buffer, idle on the current
-// sample until its done.
+// pump out a sample. If the SD card is still filling the other buffer, idle
+// on the current sample until its done.
 ISR(TIMER1_OVF_vect) {
   OCR1AL = *(buf_read + sample_index);
   sample_index++;
@@ -99,9 +99,9 @@ ISR(TIMER1_OVF_vect) {
 
 int main( void ) {
 
-  // set PB6 to output and set high to keep SSR latched
-  set_mask(&DDRB, _BV(DDB6));
-  set_mask(&PORTB, _BV(PORTB6));
+  // debug - setup led pins as output
+  set_mask(&DDRC, _BV(DDC0) & _BV(DDC1) & _BV(DDC2) & 
+      _BV(DDC3) & _BV(DDC4) & _BV(DDC5));
 
   setup_timer1();
   // make double sure we're not running the audio output
@@ -120,11 +120,14 @@ int main( void ) {
   char filename_buf[MAX_FILENAME_LEN];
   get_filename(filename_buf);
 
+  // set PB6 to output and set high to keep SSR latched
+  set_mask(&DDRB, _BV(DDB6));
+  set_mask(&PORTB, _BV(PORTB6));
+
   // pre-load buffer
   FATFS fs;
   TRY_SD_OP( pf_mount( &fs ) );
   TRY_SD_OP( pf_open(filename_buf) );
-  //TRY_SD_OP( pf_open(FILENAME) );
   read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
 
   // kick off audio
@@ -132,17 +135,14 @@ int main( void ) {
   start_PWM();
 
   while(1) {
+    // end of file flag trumps anything else
+    if( flags & MSK_FLAG_END_OF_FILE ) {
+      clr_mask(&PORTB, _BV(PORTB6));
+
     // load new data every time the buffers swap
-    if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
+    } else if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
       read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
       clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
-    }
-    
-    // if we hit the end of the file, reset the read pointer and shutdown
-    if( flags & MSK_FLAG_END_OF_FILE ) {
-      TRY_SD_OP( pf_lseek(0) );
-      clr_mask(&flags, MSK_FLAG_END_OF_FILE);
-      clr_mask(&PORTB, _BV(PORTB6));
     }
   }
 

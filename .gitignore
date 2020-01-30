@@ -15,7 +15,6 @@ fatfs_samples/
 *.jpg
 *.stl
 *.gcode
-*.mp3
 *.pcm
 features.txt
 *.FCStd1

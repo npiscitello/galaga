@@ -37,6 +37,7 @@ PGM_P const filenames[] PROGMEM = {
 
 // generate a (sorta not really) "random" number from ADC readings
 uint8_t get_random_int( uint8_t max_val ) {
+  /*
   // sample the lower 2 bits of the ADC 4 times and mod by max_val
   uint8_t rand = 0;
   PRR &= ~_BV(PRADC);
@@ -59,6 +60,8 @@ uint8_t get_random_int( uint8_t max_val ) {
   PRR |= _BV(PRADC);
 
   return rand % max_val;
+  */
+  return 6;
 }
 
 /* see https://www.nongnu.org/avr-libc/user-manual/pgmspace.html for info on how
@@ -74,6 +77,5 @@ void get_filename( char* filename_buffer ) {
         &(filenames[get_random_int(NUM_FILENAMES)])
         )
       );
-  //strcpy_P(filename_buffer, (PGM_P)pgm_read_word(&(filenames[3])));
   return;
 }
