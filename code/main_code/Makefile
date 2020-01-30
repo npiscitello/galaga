@@ -84,7 +84,7 @@ SRC = $(TARGET).c	\
 			./avr_mmcp.c	\
 			../petit_fatfs/source/pff.c \
 			sound_files.c \
-
+			utils.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = 

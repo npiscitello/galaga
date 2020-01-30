@@ -1,44 +1,40 @@
 #include <avr/pgmspace.h>
 #include "sound_files.h"
+#include "utils.h"
 
-const char oneup[] PROGMEM = "ONEUP.PCM";         // extra life sound
 const char attack[] PROGMEM = "ATTACK.PCM";       // enemy descending
-const char tracbeam[] PROGMEM = "TRACBEAM.PCM";   // ship able to be captures
 const char capdest[] PROGMEM = "CAPDEST.PCM";     // captured ship destoryed
-const char chalover[] PROGMEM = "CHALOVER.PCM";   // end of challenge stage
-const char chalperf[] PROGMEM = "CHALPERF.PCM";   // perfect challenge stage
-const char chalstage[] PROGMEM = "CHALSTAGE.PCM"; // begin challenge stage
+const char capship[] PROGMEM = "CAPSHIP.PCM";     // ship captured
+const char chalstage[] PROGMEM = "CHLSTGE.PCM"; // begin challenge stage
+const char chalover[] PROGMEM = "CHLOVER.PCM";   // end of challenge stage
+const char chalperf[] PROGMEM = "CHLPERF.PCM";   // perfect challenge stage
 const char coin[] PROGMEM = "COIN.PCM";           // coin inserted
 const char die[] PROGMEM = "DIE.PCM";             // ship destroyed
-const char capship[] PROGMEM = "CAPSHIP.PCM";     // ship captured
-const char rescship[] PROGMEM = "RESCSHIP.PCM";   // ship rescued
-const char nameent[] PROGMEM = "NAMEENT.PCM";     // name entry
 const char intro[] PROGMEM = "INTRO.PCM";         // stage intro music
+const char nameent[] PROGMEM = "NAMEENT.PCM";     // name entry
+const char oneup[] PROGMEM = "ONEUP.PCM";         // extra life sound
+const char rescship[] PROGMEM = "RSCSHIP.PCM";   // ship rescued
+const char tracbeam[] PROGMEM = "TRACBM.PCM";   // ship able to be captures
 
 // only include filenames that you want to play here
 // include a name multiple times if you want it to be more likely to be played
-#define NUM_FILENAMES 14
+// we must subtract one b/c that's the max index of the list
+#define NUM_FILENAMES 10 - 1
 PGM_P const filenames[] PROGMEM = {
-  chalstage,
-  chalstage,
-  capdest,
-  coin,
   attack,
-  capship,
-  tracbeam,
-  intro,
-  intro,
-  intro,
-  chalperf,
+  capdest,
+  chalstage,
   chalover,
+  chalperf,
+  coin,
+  intro,
+  nameent,
   rescship,
-  nameent
+  tracbeam
 };
 
 // generate a (sorta not really) "random" number from ADC readings
 uint8_t get_random_int( uint8_t max_val ) {
-  /*
-  // sample the lower 2 bits of the ADC 4 times and mod by max_val
   uint8_t rand = 0;
   PRR &= ~_BV(PRADC);
 
@@ -49,6 +45,7 @@ uint8_t get_random_int( uint8_t max_val ) {
   // all ADC pins are used as LED outputs, sample the internal temp sensor
   ADMUX = _BV(MUX3) | _BV(REFS0);
 
+  // sample the lower 2 bits of the ADC 4 times
   for( int i = 0; i < 8; i += 2 ) {
     ADCSRA |= _BV(ADSC);
     while( ADCSRA & _BV(ADSC) ) {}
@@ -59,9 +56,8 @@ uint8_t get_random_int( uint8_t max_val ) {
 
   PRR |= _BV(PRADC);
 
+  PORTC = rand % max_val;
   return rand % max_val;
-  */
-  return 6;
 }
 
 /* see https://www.nongnu.org/avr-libc/user-manual/pgmspace.html for info on how

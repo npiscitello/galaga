@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
 #include "pff.h"
 #include "diskio.h"
 #include "utils.h"
@@ -15,8 +16,6 @@
 // <TODO> add logic in the final app to power off after 
 // a certain number of failed ops
 #define TRY_SD_OP(A) while( A != FR_OK ) {}
-// debug - power off if an SD op fails
-//#define TRY_SD_OP(A) while( A != FR_OK ) {clr_mask(&PORTB, _BV(PORTB6));}
 
 
 volatile uint8_t flags = 0x00;
