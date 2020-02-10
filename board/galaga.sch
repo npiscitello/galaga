@@ -278,17 +278,6 @@ F 3 "~" H 1350 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:R R3
-U 1 1 5D70854B
-P 1700 2250
-F 0 "R3" H 1770 2296 50  0000 L CNN
-F 1 "10K" H 1770 2205 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P2.54mm_Vertical" V 1630 2250 50  0001 C CNN
-F 3 "~" H 1700 2250 50  0001 C CNN
-	1    1700 2250
-	-1   0    0    1   
-$EndComp
-$Comp
 L Switch:SW_Push SW1
 U 1 1 5D7085A6
 P 2650 1100
@@ -324,7 +313,6 @@ Wire Wire Line
 	2650 900  2650 850 
 Wire Wire Line
 	1200 850  1350 850 
-Connection ~ 1350 2500
 Text GLabel 2650 2650 3    50   Input ~ 0
 DGND
 Text GLabel 2850 3000 3    50   Input ~ 0
@@ -493,18 +481,6 @@ Wire Wire Line
 Wire Wire Line
 	2650 2650 2650 2600
 Wire Wire Line
-	1250 2500 1350 2500
-Wire Wire Line
-	1200 2500 1350 2500
-Wire Wire Line
-	1700 2100 1700 1950
-Wire Wire Line
-	1700 1950 1650 1950
-Wire Wire Line
-	1700 2400 1700 2500
-Wire Wire Line
-	1700 2500 1350 2500
-Wire Wire Line
 	1900 1550 1900 1700
 Wire Wire Line
 	1900 1700 1350 1700
@@ -517,23 +493,11 @@ Wire Wire Line
 Connection ~ 1350 1200
 Wire Wire Line
 	1350 1200 1350 1350
-Connection ~ 1700 1950
 Wire Wire Line
 	1350 850  2650 850 
 Text Notes 2650 3600 0    50   ~ 0
 HIGH = ON\nLOW = OFF
 Connection ~ 2650 850 
-Wire Wire Line
-	2650 1300 2650 1950
-Wire Wire Line
-	2650 1950 1700 1950
-Wire Wire Line
-	2650 2000 2650 1950
-Connection ~ 2650 1950
-Wire Wire Line
-	2850 2000 2850 850 
-Wire Wire Line
-	2650 850  2850 850 
 Text Notes 6550 2600 0    50   ~ 0
 HIGH = ON\nLOW = OFF
 Wire Wire Line
@@ -555,4 +519,64 @@ Wire Wire Line
 Wire Wire Line
 	5550 1550 5550 1600
 Connection ~ 5450 1550
+Text GLabel 6100 3800 2    50   Input ~ 0
+INT0
+Wire Wire Line
+	6050 3800 6100 3800
+Wire Wire Line
+	2650 850  2850 850 
+$Comp
+L Device:R R?
+U 1 1 5E33265C
+P 1950 2500
+F 0 "R?" V 1743 2500 50  0001 C CNN
+F 1 "18k" V 1835 2500 50  0000 C CNN
+F 2 "" V 1880 2500 50  0001 C CNN
+F 3 "~" H 1950 2500 50  0001 C CNN
+	1    1950 2500
+	0    1    1    0   
+$EndComp
+Text GLabel 1750 2550 3    50   Input ~ 0
+INT0
+$Comp
+L Device:R R?
+U 1 1 5E3398F2
+P 1550 2500
+F 0 "R?" V 1343 2500 50  0001 C CNN
+F 1 "10k" V 1435 2500 50  0000 C CNN
+F 2 "" V 1480 2500 50  0001 C CNN
+F 3 "~" H 1550 2500 50  0001 C CNN
+	1    1550 2500
+	0    1    1    0   
+$EndComp
+Connection ~ 2650 1950
+Wire Wire Line
+	2650 1950 2650 2000
+Wire Wire Line
+	1700 2500 1750 2500
+Wire Wire Line
+	1750 2550 1750 2500
+Connection ~ 1750 2500
+Wire Wire Line
+	1750 2500 1800 2500
+Wire Wire Line
+	2650 1300 2650 1950
+Wire Wire Line
+	2850 850  2850 2000
+Wire Wire Line
+	1650 1950 2150 1950
+Wire Wire Line
+	1200 2500 1350 2500
+Wire Wire Line
+	1400 2500 1350 2500
+Connection ~ 1350 2500
+Wire Wire Line
+	2100 2500 2150 2500
+Wire Wire Line
+	2150 2500 2150 1950
+Connection ~ 2150 1950
+Wire Wire Line
+	2150 1950 2650 1950
+Text Notes 800  3150 0    50   ~ 0
+this seems to act like closing the switch -\nprobs cuz we're mixing bat and dig ground.
 $EndSCHEMATC

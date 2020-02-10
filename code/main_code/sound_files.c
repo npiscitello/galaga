@@ -19,18 +19,54 @@ const char tracbeam[] PROGMEM = "TRACBM.PCM";   // ship able to be captures
 // only include filenames that you want to play here
 // include a name multiple times if you want it to be more likely to be played
 // we must subtract one b/c that's the max index of the list
-#define NUM_FILENAMES 10 - 1
+// repeated names just makes the list longer, giving the rng more space to work
+#define NUM_FILENAMES 45 - 1
 PGM_P const filenames[] PROGMEM = {
   attack,
   capdest,
   chalstage,
+  chalstage,
   chalover,
+  chalover,
+  chalperf,
   chalperf,
   coin,
   intro,
+  intro,
+  nameent,
   nameent,
   rescship,
-  tracbeam
+  tracbeam,
+  attack,
+  capdest,
+  chalstage,
+  chalstage,
+  chalover,
+  chalover,
+  chalperf,
+  chalperf,
+  coin,
+  intro,
+  intro,
+  nameent,
+  nameent,
+  rescship,
+  tracbeam,
+  attack,
+  capdest,
+  chalstage,
+  chalstage,
+  chalover,
+  chalover,
+  chalperf,
+  chalperf,
+  coin,
+  intro,
+  intro,
+  nameent,
+  nameent,
+  rescship,
+  tracbeam,
 };
 
 // generate a (sorta not really) "random" number from ADC readings
@@ -38,12 +74,12 @@ uint8_t get_random_int( uint8_t max_val ) {
   uint8_t rand = 0;
   PRR &= ~_BV(PRADC);
 
-  // enable w/ prescaler of 32 (results in an ADC frequency a bit higher than
-  // spec, but we specifically want bad data)
-  ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS0);
+  // ADC needs clock between 50kHz and 200kHz
+  // prescaler = 64, 125kHz clock
+  ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1);
 
-  // all ADC pins are used as LED outputs, sample the internal temp sensor
-  ADMUX = _BV(MUX3) | _BV(REFS0);
+  // sample the furthest pin from ground, ref against AVCC
+  ADMUX = _BV(MUX2) | _BV(MUX0) | _BV(REFS0);
 
   // sample the lower 2 bits of the ADC 4 times
   for( int i = 0; i < 8; i += 2 ) {
@@ -56,7 +92,6 @@ uint8_t get_random_int( uint8_t max_val ) {
 
   PRR |= _BV(PRADC);
 
-  PORTC = rand % max_val;
   return rand % max_val;
 }
 

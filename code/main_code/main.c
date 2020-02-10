@@ -14,7 +14,7 @@
 
 // if an SD card op fails all we can do is try again
 // <TODO> add logic in the final app to power off after 
-// a certain number of failed ops
+// a certain number of failed ops in a row
 #define TRY_SD_OP(A) while( A != FR_OK ) {}
 
 
@@ -22,11 +22,12 @@ volatile uint8_t flags = 0x00;
 #define MSK_FLAG_SD_READING       0x01
 #define MSK_FLAG_BUFFER_SWAPPED   0x02
 #define MSK_FLAG_END_OF_FILE      0x04
+#define MSK_BUTTON_PRESSED        0x08
 
 // there's gotta be a better way to do this than using so many globals
 // the active buffer with audio data
 volatile uint8_t* buf_read;
-// the secondary buffer being loaded with data from the SD car3
+// the secondary buffer being loaded with data from the SD card
 volatile uint8_t* buf_load;
 // which sample is currently being read from that sample buffer
 volatile uint16_t sample_index = 0;
@@ -40,7 +41,7 @@ void setup_timer1(void) {
   // set OC1A (PB1) to output
   set_mask(&DDRB, _BV(DDB1));
   // turn on timer 1
-  PRR = 0xFF & !_BV(PRTIM1);
+  PRR &= 0xFF & ~_BV(PRTIM1);
 
   // PWM setup
   // set pin behavior (non-inverted) and part of waveform mode (fast PWM, TOP=ICR1)
@@ -60,6 +61,7 @@ void setup_timer1(void) {
 
   // enable global interrupts
   sei();
+  return;
 }
 
 
@@ -70,6 +72,7 @@ void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
   set_mask(&flags, MSK_FLAG_SD_READING);
   TRY_SD_OP( pf_read(read_buf, num_bytes, &bytes_read) );
   clr_mask(&flags, MSK_FLAG_SD_READING);
+
   if( bytes_read < num_bytes ) {
     set_mask(&flags, MSK_FLAG_END_OF_FILE);
   }
@@ -98,15 +101,14 @@ ISR(TIMER1_OVF_vect) {
 
 int main( void ) {
 
-  // debug - setup led pins as output
+  // LED pins are all output (even the one used for the ADC!)
   set_mask(&DDRC, _BV(DDC0) & _BV(DDC1) & _BV(DDC2) & 
       _BV(DDC3) & _BV(DDC4) & _BV(DDC5));
 
   setup_timer1();
-  // make double sure we're not running the audio output
   stop_PWM();
 
-  // set up buffers
+  // set up audio buffers
   buf_read = malloc(BUFFER_SIZE);
   buf_load = malloc(BUFFER_SIZE);
   if( (buf_read == 0) || (buf_load == 0) ) {
@@ -115,17 +117,21 @@ int main( void ) {
     clr_mask(&PORTB, _BV(PORTB6));
   }
 
-  // figure out what sound we'll be playing
-  char filename_buf[MAX_FILENAME_LEN];
-  get_filename(filename_buf);
-
   // set PB6 to output and set high to keep SSR latched
+  // we don't do this in the beginning in case the chip browns-out and resets as
+  // the board turns off - putting it a handful of instructions down means it's
+  // still quick enough to be 'instantaneous' to humans but not fast enough to
+  // accidentally trigger and re-latch the SSR as the board is turning off.
   set_mask(&DDRB, _BV(DDB6));
   set_mask(&PORTB, _BV(PORTB6));
 
-  // pre-load buffer
+  // mount SD card
   FATFS fs;
   TRY_SD_OP( pf_mount( &fs ) );
+
+  // figure out what sound we'll be playing
+  char filename_buf[MAX_FILENAME_LEN];
+  get_filename(filename_buf);
   TRY_SD_OP( pf_open(filename_buf) );
   read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
 
@@ -133,18 +139,16 @@ int main( void ) {
   swap_buffers(&buf_read, &buf_load);
   start_PWM();
 
-  while(1) {
-    // end of file flag trumps anything else
-    if( flags & MSK_FLAG_END_OF_FILE ) {
-      clr_mask(&PORTB, _BV(PORTB6));
-
+  // make super duper sure we don't miss the end of file flag
+  while(!(flags & MSK_FLAG_END_OF_FILE)) {
     // load new data every time the buffers swap
-    } else if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
+    if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
       read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
       clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
     }
   }
 
-  // here's hoping we never get here...
+  // un-latch the SSR
+  clr_mask(&PORTB, _BV(PORTB6));
   return 0;
 }

@@ -1,6 +1,8 @@
 #ifndef SOUND_FILES_H
 #define SOUND_FILES_H
 
+#include <avr/io.h>
+
 // the filenames themselves are defined in sound_files.c - they don't need to be
 // available to the rest of the code
 
