@@ -12,11 +12,14 @@
 // how many bytes are in each of the double buffers
 #define BUFFER_SIZE 512
 
+// how many 33-millisecond ticks to wait before the LEDs change
+// (12 is a little under 152 BPM, the tempo of the intro)
+#define LED_DELAY 12
+
 // if an SD card op fails all we can do is try again
 // <TODO> add logic in the final app to power off after 
 // a certain number of failed ops in a row
 #define TRY_SD_OP(A) while( A != FR_OK ) {}
-
 
 volatile uint8_t flags = 0x00;
 #define MSK_FLAG_SD_READING       0x01
@@ -24,24 +27,30 @@ volatile uint8_t flags = 0x00;
 #define MSK_FLAG_END_OF_FILE      0x04
 #define MSK_BUTTON_PRESSED        0x08
 
+
+
+ /***********************\
+|***** AUDIO AND DAC *****|
+ \***********************/
+
 // there's gotta be a better way to do this than using so many globals
 // the active buffer with audio data
-volatile uint8_t* buf_read;
+volatile uint8_t* g_buf_read;
 // the secondary buffer being loaded with data from the SD card
-volatile uint8_t* buf_load;
+volatile uint8_t* g_buf_load;
 // which sample is currently being read from that sample buffer
-volatile uint16_t sample_index = 0;
+volatile uint16_t g_sample_index = 0;
 
 
 
 // this is the main DAC
-void setup_timer1(void) {
+void setup_dac(void) {
   // disable interrupts globally for setup
   cli();
   // set OC1A (PB1) to output
   set_mask(&DDRB, _BV(DDB1));
   // turn on timer 1
-  PRR &= 0xFF & ~_BV(PRTIM1);
+  clr_mask(&PRR, _BV(PRTIM1));
 
   // PWM setup
   // set pin behavior (non-inverted) and part of waveform mode (fast PWM, TOP=ICR1)
@@ -84,14 +93,14 @@ void read_chunk( uint8_t* read_buf, uint16_t num_bytes ) {
 // pump out a sample. If the SD card is still filling the other buffer, idle
 // on the current sample until its done.
 ISR(TIMER1_OVF_vect) {
-  OCR1AL = *(buf_read + sample_index);
-  sample_index++;
-  if( sample_index >= BUFFER_SIZE ) {
+  OCR1AL = *(g_buf_read + g_sample_index);
+  g_sample_index++;
+  if( g_sample_index >= BUFFER_SIZE ) {
     if( flags & MSK_FLAG_SD_READING ) {
-      sample_index--;
+      g_sample_index--;
     } else {
-      sample_index = 0;
-      swap_buffers(&buf_read, &buf_load);
+      g_sample_index = 0;
+      swap_buffers(&g_buf_read, &g_buf_load);
       set_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
     }
   }
@@ -99,19 +108,87 @@ ISR(TIMER1_OVF_vect) {
 
 
 
+void stop_PWM(void) {
+  clr_mask(&TCCR1B, _BV(CS12) | _BV(CS11) | _BV(CS10));
+}
+
+void start_PWM(void) {
+  // no prescaler for timer1 (DAC)
+  set_mask(&TCCR1B, _BV(CS10));
+}
+
+
+
+ /**************************\
+|***** LEDS AND FLASHING*****|
+ \**************************/
+
+// simulate a 16 bit timer (make sure an LED change triggers on first enable)
+volatile uint8_t g_timer0_cycles = LED_DELAY;
+// state - this gets written directly to Port C. LSB is the far right blaster.
+volatile uint8_t g_led_state = 0x2A;
+
+
+
+void setup_leds( void ) {
+  // LED pins are all output (even the one used for the ADC!)
+  set_mask(&DDRC, _BV(DDC0) | _BV(DDC1) | _BV(DDC2) | 
+      _BV(DDC3) | _BV(DDC4) | _BV(DDC5));
+
+  // We're sourcing, so start all LED pins low
+  set_mask(&PORTC, _BV(PORTC0) | _BV(PORTC1) | _BV(PORTC2) |
+      _BV(PORTC3) | _BV(PORTC4) | _BV(PORTC5));
+
+  // see setup_dac function for details
+  // prescaler set in the start_LED function
+  cli();
+  clr_mask(&PRR, _BV(PRTIM0));
+  TIMSK0 = _BV(TOIE0);
+  TIFR0 = 0xFF;
+  sei();
+  return;
+}
+
+
+
+ISR(TIMER0_OVF_vect) {
+  if( ++g_timer0_cycles > LED_DELAY ) {
+    g_timer0_cycles = 0;
+    // write LEDs! We want to make sure to only write to the 6 LED pins.
+    // flip LED state
+    g_led_state = ~g_led_state;
+    PORTC &= 0xC0;
+    PORTC |= g_led_state & 0x3F;
+  }
+}
+
+
+
+void stop_LED( void ) {
+  clr_mask(&TCCR0B, _BV(CS02) | _BV(CS01) | _BV(CS00));
+}
+
+void start_LED( void ) {
+  // make sure we trigger as soon as we enable
+  TCNT0 = 0xFF;
+  // 1024 prescaler for timer0 (LED flasher)
+  set_mask(&TCCR0B, _BV(CS02) | _BV(CS00));
+}
+
+
+
 int main( void ) {
 
-  // LED pins are all output (even the one used for the ADC!)
-  set_mask(&DDRC, _BV(DDC0) & _BV(DDC1) & _BV(DDC2) & 
-      _BV(DDC3) & _BV(DDC4) & _BV(DDC5));
+  setup_leds();
+  stop_LED();
 
-  setup_timer1();
+  setup_dac();
   stop_PWM();
 
   // set up audio buffers
-  buf_read = malloc(BUFFER_SIZE);
-  buf_load = malloc(BUFFER_SIZE);
-  if( (buf_read == 0) || (buf_load == 0) ) {
+  g_buf_read = malloc(BUFFER_SIZE);
+  g_buf_load = malloc(BUFFER_SIZE);
+  if( (g_buf_read == 0) || (g_buf_load == 0) ) {
     // I don't know how to recover from a malloc error
     // shut off and try again next time!
     clr_mask(&PORTB, _BV(PORTB6));
@@ -133,17 +210,18 @@ int main( void ) {
   char filename_buf[MAX_FILENAME_LEN];
   get_filename(filename_buf);
   TRY_SD_OP( pf_open(filename_buf) );
-  read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
+  read_chunk( (uint8_t*)g_buf_load, BUFFER_SIZE );
 
   // kick off audio
-  swap_buffers(&buf_read, &buf_load);
+  swap_buffers(&g_buf_read, &g_buf_load);
   start_PWM();
+  start_LED();
 
   // make super duper sure we don't miss the end of file flag
   while(!(flags & MSK_FLAG_END_OF_FILE)) {
     // load new data every time the buffers swap
     if( flags & MSK_FLAG_BUFFER_SWAPPED ) {
-      read_chunk( (uint8_t*)buf_load, BUFFER_SIZE );
+      read_chunk( (uint8_t*)g_buf_load, BUFFER_SIZE );
       clr_mask(&flags, MSK_FLAG_BUFFER_SWAPPED);
     }
   }
