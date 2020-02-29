@@ -13,13 +13,30 @@
 // how many bytes are in each of the double buffers
 #define BUFFER_SIZE 512
 
+// definition for the LED bootup
 // how many 33-millisecond ticks to wait before the LEDs change during an
 // animation (12 is a little under 152 BPM, the tempo of the intro)
-#define LED_ANIMATION_DELAY 8
+#define LED_BOOTUP_DELAY 3
+// how many frames are in the bootup sequence (oneshot)
+#define LED_BOOTUP_STEPS 4
+// led frames - each byte gets masked and written to Port C.
+// LSB is the far right blaster.
+const uint8_t g_led_bootup_frames[] PROGMEM = {
+  0x00, 0x0C, 0x2D, 0x3F
+};
 
 // definition for the LED animation
-#define LED_ANIMATION_STEPS 2
-const uint8_t g_animations[] PROGMEM = {0x2A, 0x15};
+// how many 33-millisecond ticks to wait before the LEDs change during an
+// animation (12 is a little under 152 BPM, the tempo of the intro)
+#define LED_ANIMATION_DELAY 4
+// how many frames are in the animation sequence (looping)
+#define LED_ANIMATION_STEPS 6
+// led frames - each byte gets masked and written to Port C.
+// LSB is the far right blaster.
+//const uint8_t g_led_animation_frames[] PROGMEM = {0x2A, 0x15};
+const uint8_t g_led_animation_frames[] PROGMEM = {
+  0x2C, 0x1C, 0x02, 0x0D, 0x0E, 0x10
+};
 
 // if an SD card op fails all we can do is try again
 // <TODO> add logic in the final app to power off after 
@@ -130,10 +147,8 @@ void start_PWM(void) {
 
 // simulate a 16 bit timer (make sure an LED change triggers on first enable)
 volatile uint8_t g_timer0_cycles = LED_ANIMATION_DELAY;
-// state - this gets written directly to Port C. LSB is the far right blaster.
-volatile uint8_t g_led_state = 0x2A;
-// which animation step we're on
-volatile uint8_t g_animation_step = 0;
+// which frame we're on
+volatile uint8_t g_current_frame = 0;
 
 
 
@@ -160,17 +175,24 @@ void setup_leds( void ) {
 
 ISR(TIMER0_OVF_vect) {
   if( !(flags & MSK_FLAG_SD_READY) ) {
-    // cool bootup animation?
+    if( ++g_timer0_cycles > LED_BOOTUP_DELAY ) {
+      g_timer0_cycles = 0;
+      PORTC &= 0xC0;
+      // avr compiler magic, YCM will complain
+      PORTC |= pgm_read_byte(&(g_led_bootup_frames[g_current_frame])) & 0x3F;
+      // we only want it to run once
+      if( g_current_frame < LED_BOOTUP_STEPS - 1 ) {
+        ++g_current_frame;
+      }
+    }
   } else {
     if( ++g_timer0_cycles > LED_ANIMATION_DELAY ) {
       g_timer0_cycles = 0;
-      // write LEDs! We want to make sure to only write to the 6 LED pins.
-      // avr compiler magic, YCM will complain
-      g_led_state = pgm_read_byte(&(g_animations[g_animation_step]));
       PORTC &= 0xC0;
-      PORTC |= g_led_state & 0x3F;
-      if( ++g_animation_step >= LED_ANIMATION_STEPS ) {
-        g_animation_step = 0;
+      // avr compiler magic, YCM will complain
+      PORTC |= pgm_read_byte(&(g_led_animation_frames[g_current_frame])) & 0x3F;
+      if( ++g_current_frame >= LED_ANIMATION_STEPS ) {
+        g_current_frame = 0;
       }
     }
   }
@@ -198,7 +220,7 @@ int main( void ) {
   get_filename(filename_buf);
 
   setup_leds();
-  stop_LED();
+  start_LED();
 
   setup_dac();
   stop_PWM();
@@ -228,11 +250,13 @@ int main( void ) {
   TRY_SD_OP( pf_open(filename_buf) );
   read_chunk( (uint8_t*)g_buf_load, BUFFER_SIZE );
 
-  // kick off audio
+  // switch the LEDs from the bootup sequence to the animation sequence
   set_mask(&flags, MSK_FLAG_SD_READY);
+  g_current_frame = 0;
+
+  // kick off audio
   swap_buffers(&g_buf_read, &g_buf_load);
   start_PWM();
-  start_LED();
 
   // make super duper sure we don't miss the end of file flag
   while(!(flags & MSK_FLAG_END_OF_FILE)) {
